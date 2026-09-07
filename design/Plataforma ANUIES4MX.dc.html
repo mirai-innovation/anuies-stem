@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  body{margin:0;background:#FBF5F8;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#26212E;-webkit-font-smoothing:antialiased;}
+  *{box-sizing:border-box;}
+  a{color:#D6336C;text-decoration:none;}
+  a:hover{color:#8A1F49;text-decoration:underline;text-underline-offset:3px;}
+  input,select,textarea,button{font-family:inherit;}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:#FBF5F8;display:flex;flex-direction:column">
+
+  <div style="display:flex;flex-wrap:wrap;gap:14px 24px;align-items:center;justify-content:space-between;padding:10px 20px;background:#26212E;color:#F3EAF0;position:sticky;top:0;z-index:20">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#B9AEC2">Vista previa de diseño</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;color:#FF6FA5">{{ viewLabel }}</span>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <sc-for list="{{ roles }}" as="r" hint-placeholder-count="4">
+        <button onClick="{{ r.onClick }}" style="padding:7px 13px;border:1px solid rgba(243,234,240,.22);background:transparent;color:#F3EAF0;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer" style-hover="border-color:#FF6FA5">
+          <sc-if value="{{ r.active }}" hint-placeholder-val="{{ false }}"><span style="color:#26212E;background:#FF6FA5;margin:-7px -13px;padding:7px 13px;display:inline-block">{{ r.label }}</span></sc-if>
+          <sc-if value="{{ r.inactive }}" hint-placeholder-val="{{ true }}"><span>{{ r.label }}</span></sc-if>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;flex:1;align-items:stretch">
+
+    <sc-if value="{{ isApp }}" hint-placeholder-val="{{ true }}">
+      <aside style="flex:1 1 252px;background:#fff;border-right:1px solid #EEE3EA;display:flex;flex-direction:column;justify-content:space-between">
+        <div>
+          <div style="padding:22px 20px;border-bottom:1px solid #EEE3EA">
+            <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:22px;line-height:.95;text-transform:uppercase;color:#26212E">ANUIES<span style="color:#D6336C">4MX</span></div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#736C7B;margin-top:6px">Mujeres en STEM · 2026</div>
+          </div>
+          <nav style="display:flex;flex-direction:column;padding:14px 0">
+            <sc-for list="{{ nav }}" as="n" hint-placeholder-count="5">
+              <button onClick="{{ n.onClick }}" style="display:flex;align-items:center;gap:10px;text-align:left;padding:11px 20px;border:0;background:transparent;cursor:pointer;font-size:13.5px;color:#26212E" style-hover="background:#FBF5F8">
+                <sc-if value="{{ n.active }}" hint-placeholder-val="{{ false }}"><span style="width:3px;height:16px;background:#D6336C;flex:none"></span></sc-if>
+                <sc-if value="{{ n.inactive }}" hint-placeholder-val="{{ true }}"><span style="width:3px;height:16px;background:transparent;flex:none"></span></sc-if>
+                <span>{{ n.label }}</span>
+              </button>
+            </sc-for>
+          </nav>
+        </div>
+        <div style="padding:18px 20px;border-top:1px solid #EEE3EA;display:flex;gap:11px;align-items:center">
+          <div style="width:34px;height:34px;flex:none;background:#FBE1EC;color:#8A1F49;display:grid;place-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600">{{ userInitials }}</div>
+          <div style="min-width:0">
+            <div style="font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ userName }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#736C7B">{{ roleLabel }}</div>
+          </div>
+        </div>
+      </aside>
+    </sc-if>
+
+    <main style="flex:999 1 340px;min-width:0">
+
+      <!-- ================= LOGIN ================= -->
+      <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));min-height:calc(100vh - 44px)">
+          <div style="background:#26212E;color:#F3EAF0;padding:56px 48px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+            <div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#B9AEC2">ANUIES × Mirai Innovation Research Institute</div>
+              <h1 style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:clamp(38px,5vw,60px);line-height:.92;text-transform:uppercase;margin:18px 0 0">Reto ANUIES4MX<br /><span style="color:#FF6FA5">Mujeres STEM</span></h1>
+              <p style="font-family:'Big Shoulders Display',sans-serif;font-weight:500;font-size:22px;color:#F3EAF0;margin:14px 0 0">Negocios del Futuro con Tecnologías Emergentes</p>
+              <p style="font-size:14px;line-height:1.65;color:#B9AEC2;margin:20px 0 0;max-width:44ch;text-wrap:pretty">Plataforma de postulación y evaluación. Programa intensivo de 5 días en Valle de Bravo, con cierre en Demo Day ante jurado.</p>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#B9AEC2">
+              <div style="display:flex;gap:10px"><span style="color:#5FD6CD">Cierre</span> 15 NOV 2026 · 23:59 CST</div>
+              <div style="display:flex;gap:10px"><span style="color:#5FD6CD">Evento</span> 13 — 18 DIC 2026 · Valle de Bravo</div>
+            </div>
+          </div>
+          <div style="background:#fff;padding:56px 48px;display:flex;align-items:center;justify-content:center">
+            <div style="width:100%;max-width:380px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#736C7B">Acceso a la plataforma</div>
+              <h2 style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:34px;text-transform:uppercase;margin:8px 0 28px">Iniciar sesión</h2>
+              <label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Correo institucional</label>
+              <input type="email" placeholder="nombre@universidad.mx" style="width:100%;padding:12px;border:1px solid #E2CDDA;background:#fff;font-size:14px;color:#26212E;margin-bottom:18px" />
+              <label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Contraseña</label>
+              <input type="password" placeholder="••••••••" style="width:100%;padding:12px;border:1px solid #E2CDDA;background:#fff;font-size:14px;color:#26212E;margin-bottom:10px" />
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:26px;font-size:12.5px">
+                <label style="display:flex;align-items:center;gap:8px;color:#736C7B"><input type="checkbox" style="accent-color:#D6336C" /> Mantener sesión</label>
+                <a href="#recuperar">¿Olvidaste tu contraseña?</a>
+              </div>
+              <button style="width:100%;background:#D6336C;color:#fff;border:1px solid #D6336C;padding:14px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer" style-hover="background:#8A1F49;border-color:#8A1F49">Entrar →</button>
+              <div style="margin-top:22px;padding-top:22px;border-top:1px solid #EEE3EA;font-size:13px;color:#736C7B">¿Aún no tienes cuenta? <a href="#registro" onClick="{{ goSignup }}">Crea tu registro</a></div>
+              <div style="margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#736C7B;line-height:1.6">Acceso de comité y ANUIES con las mismas credenciales;<br />el rol define la vista.</div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ================= REGISTRO ================= -->
+      <sc-if value="{{ isSignup }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:1080px;margin:0 auto;padding:44px 28px 64px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#736C7B">Paso previo · crear cuenta</div>
+          <h2 style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:40px;text-transform:uppercase;margin:8px 0 6px">Registro de aplicante</h2>
+          <p style="font-size:14px;color:#736C7B;max-width:62ch;margin:0 0 30px;text-wrap:pretty">Crea tu cuenta para iniciar la postulación. Podrás guardar tu avance y volver antes del 15 de noviembre de 2026.</p>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;align-items:start">
+            <div style="background:#fff;border:1px solid #EEE3EA;padding:26px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#D6336C;margin-bottom:20px">Datos de la cuenta</div>
+              <div style="display:grid;gap:16px">
+                <div>
+                  <label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Nombre completo</label>
+                  <input placeholder="Nombre y apellidos" style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px" />
+                </div>
+                <div>
+                  <label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Correo institucional</label>
+                  <input type="email" placeholder="nombre@universidad.mx" style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px" />
+                </div>
+                <div>
+                  <label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Universidad asociada a ANUIES</label>
+                  <select style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px;background:#fff">
+                    <option>Selecciona tu institución…</option>
+                    <option>Universidad Nacional Autónoma de México</option>
+                    <option>Instituto Politécnico Nacional</option>
+                    <option>Universidad de Guadalajara</option>
+                    <option>Tecnológico Nacional de México</option>
+                  </select>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px">
+                  <div>
+                    <label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Contraseña</label>
+                    <input type="password" placeholder="••••••••" style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px" />
+                  </div>
+                  <div>
+                    <label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Confirmar</label>
+                    <input type="password" placeholder="••••••••" style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px" />
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top:24px;padding-top:22px;border-top:1px solid #EEE3EA;display:grid;gap:12px;font-size:13px;color:#26212E">
+                <label style="display:flex;gap:10px;align-items:flex-start"><input type="checkbox" style="accent-color:#D6336C;margin-top:3px" /> <span>Declaro estar inscrita en un programa de educación superior en un área STEM y <strong>no cursar el último año</strong> de mi programa.</span></label>
+                <label style="display:flex;gap:10px;align-items:flex-start"><input type="checkbox" style="accent-color:#D6336C;margin-top:3px" /> <span>Acepto el aviso de privacidad y las bases de la convocatoria.</span></label>
+              </div>
+              <button style="margin-top:24px;background:#D6336C;color:#fff;border:1px solid #D6336C;padding:13px 22px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer" style-hover="background:#8A1F49;border-color:#8A1F49">Crear cuenta →</button>
+              <div style="margin-top:16px;font-size:13px;color:#736C7B">¿Ya tienes cuenta? <a href="#login" onClick="{{ goLogin }}">Inicia sesión</a></div>
+            </div>
+
+            <div style="background:#FBE1EC;border:1px solid #F3CFDF;padding:26px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#8A1F49;margin-bottom:16px">Ten a la mano</div>
+              <ol style="margin:0;padding-left:20px;display:grid;gap:11px;font-size:13.5px;line-height:1.55;color:#26212E">
+                <li>Constancia de inscripción emitida por tu universidad ANUIES.</li>
+                <li>Relación de estudios oficial con promedio global mínimo de 9.0.</li>
+                <li>Carta compromiso con ANUIES (formato oficial).</li>
+                <li>Carta de respaldo de tu institución.</li>
+                <li>Currículum vitae actualizado.</li>
+                <li>Video de propuesta de hasta 90 segundos.</li>
+              </ol>
+              <div style="margin-top:20px;padding-top:18px;border-top:1px solid #F3CFDF;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A1F49;line-height:1.6">Cierre de recepción<br /><strong style="font-size:14px">15 NOV 2026 · 23:59 CST</strong></div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ================= APLICANTE · DASHBOARD ================= -->
+      <sc-if value="{{ isDash }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:1080px;padding:38px 32px 64px">
+          <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;margin-bottom:30px">
+            <div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#736C7B">Mi convocatoria</div>
+              <h2 style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:40px;text-transform:uppercase;margin:6px 0 0">Hola, Ana Sofía</h2>
+            </div>
+            <div style="background:#26212E;color:#F3EAF0;padding:12px 18px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em">Cierra en 69 días · 15 NOV 2026</div>
+          </div>
+
+          <div style="background:#fff;border:1px solid #EEE3EA;padding:24px;margin-bottom:24px">
+            <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:baseline">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B">Avance de mi aplicación</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#D6336C;font-weight:600">2 de 4 secciones · 50%</div>
+            </div>
+            <div style="height:6px;background:#EEE3EA;margin:14px 0 22px"><div style="width:50%;height:6px;background:#D6336C"></div></div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px">
+              <sc-for list="{{ steps }}" as="s" hint-placeholder-count="5">
+                <button onClick="{{ s.onClick }}" style="text-align:left;border:1px solid #EEE3EA;background:#FBF5F8;padding:16px;cursor:pointer" style-hover="border-color:#D6336C">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:#736C7B">{{ s.num }}</div>
+                  <div style="font-size:14px;font-weight:600;margin:8px 0 10px;line-height:1.3">{{ s.label }}</div>
+                  <sc-if value="{{ s.done }}" hint-placeholder-val="{{ true }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;background:#DCEEEC;color:#1F5E5C;padding:4px 8px">Completo</span></sc-if>
+                  <sc-if value="{{ s.pending }}" hint-placeholder-val="{{ false }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;background:#FBE1EC;color:#8A1F49;padding:4px 8px">Pendiente</span></sc-if>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;align-items:start">
+            <div style="background:#fff;border:1px solid #EEE3EA;padding:24px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:18px">Estado de mi postulación</div>
+              <div style="display:grid;gap:0">
+                <sc-for list="{{ timeline }}" as="t" hint-placeholder-count="6">
+                  <div style="display:grid;grid-template-columns:14px 1fr;gap:14px;padding-bottom:20px">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+                      <sc-if value="{{ t.done }}" hint-placeholder-val="{{ true }}"><span style="width:11px;height:11px;background:#D6336C;flex:none"></span></sc-if>
+                      <sc-if value="{{ t.todo }}" hint-placeholder-val="{{ false }}"><span style="width:11px;height:11px;border:1px solid #E2CDDA;background:#fff;flex:none"></span></sc-if>
+                      <span style="width:1px;flex:1;background:#EEE3EA;min-height:22px"></span>
+                    </div>
+                    <div>
+                      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.06em;color:#D6336C;font-weight:600">{{ t.date }}</div>
+                      <div style="font-size:13.5px;font-weight:500;margin-top:3px">{{ t.stage }}</div>
+                      <div style="font-size:12.5px;color:#736C7B;margin-top:2px">{{ t.note }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="display:grid;gap:24px">
+              <div style="background:#26212E;color:#F3EAF0;padding:24px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#B9AEC2;margin-bottom:12px">Siguiente acción</div>
+                <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:26px;text-transform:uppercase;line-height:1.05">Sube tu video de propuesta</div>
+                <p style="font-size:13.5px;color:#B9AEC2;margin:12px 0 20px;line-height:1.6">Hasta 90 segundos. Presenta el problema, tu solución y la tecnología emergente que usarás.</p>
+                <button onClick="{{ goVideo }}" style="background:#FF6FA5;color:#26212E;border:0;padding:12px 20px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer">Ir al paso 3 →</button>
+              </div>
+              <div style="background:#DCEEEC;border:1px solid #C4E2DF;padding:24px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#1F5E5C;margin-bottom:12px">Criterios con que serás evaluada</div>
+                <ol style="margin:0;padding-left:18px;display:grid;gap:8px;font-size:13px;line-height:1.5;color:#26212E">
+                  <li>Claridad de la idea de negocio</li>
+                  <li>Innovación y relevancia tecnológica</li>
+                  <li>Impacto social</li>
+                  <li>Viabilidad técnica y económica</li>
+                  <li>Presentación del video</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ================= APLICANTE · PASO 1 DATOS ================= -->
+      <sc-if value="{{ isDatos }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:980px;padding:38px 32px 64px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#736C7B">Aplicación · paso 1 de 4</div>
+          <h2 style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:38px;text-transform:uppercase;margin:6px 0 22px">Datos personales y académicos</h2>
+
+          <div style="display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap">
+            <sc-for list="{{ wizard }}" as="w" hint-placeholder-count="4">
+              <button onClick="{{ w.onClick }}" style="flex:1;min-width:130px;text-align:left;border:0;border-top:3px solid #EEE3EA;background:transparent;padding:10px 0 0;cursor:pointer">
+                <sc-if value="{{ w.active }}" hint-placeholder-val="{{ true }}"><span style="display:block;height:3px;background:#D6336C;margin:-13px 0 10px"></span></sc-if>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B">{{ w.num }}</div>
+                <div style="font-size:13px;font-weight:500;margin-top:3px">{{ w.label }}</div>
+              </button>
+            </sc-for>
+          </div>
+
+          <div style="background:#fff;border:1px solid #EEE3EA;padding:28px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#D6336C;margin-bottom:20px">Identificación</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px">
+              <div><label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Nombre completo</label><input value="Ana Sofía Márquez Duarte" style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px" /></div>
+              <div><label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">CURP</label><input placeholder="MADA010203MDFXXX00" style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px" /></div>
+              <div><label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Fecha de nacimiento</label><input type="date" style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px" /></div>
+              <div><label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Teléfono</label><input placeholder="+52 55 0000 0000" style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px" /></div>
+              <div><label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Estado de residencia</label><select style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px;background:#fff"><option>Ciudad de México</option><option>Estado de México</option><option>Jalisco</option></select></div>
+              <div><label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Correo institucional</label><input value="asmarquez@universidad.mx" style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px;background:#FBF5F8;color:#736C7B" /></div>
+            </div>
+
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#D6336C;margin:34px 0 20px;padding-top:24px;border-top:1px solid #EEE3EA">Trayectoria académica</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px">
+              <div><label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Universidad ANUIES</label><select style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px;background:#fff"><option>Universidad Nacional Autónoma de México</option><option>Instituto Politécnico Nacional</option></select></div>
+              <div><label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Programa educativo</label><input placeholder="Ingeniería en Mecatrónica" style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px" /></div>
+              <div><label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Nivel</label><select style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px;background:#fff"><option>Licenciatura</option><option>Especialidad</option><option>Posgrado</option></select></div>
+              <div><label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Semestre actual</label><input placeholder="6º" style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px" /></div>
+              <div><label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Promedio global acumulado</label><input placeholder="9.4" style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px" /><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A1F49;margin-top:6px">Mínimo requerido: 9.0</div></div>
+              <div><label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Área STEM</label><select style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px;background:#fff"><option>Ingeniería</option><option>Ciencias de la computación</option><option>Ciencias exactas</option><option>Matemáticas</option><option>Ciencias de la salud</option></select></div>
+            </div>
+            <label style="display:flex;gap:10px;align-items:flex-start;margin-top:22px;font-size:13px"><input type="checkbox" style="accent-color:#D6336C;margin-top:3px" /> <span>Confirmo que <strong>no curso el último año</strong> de mi programa educativo.</span></label>
+
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#D6336C;margin:34px 0 20px;padding-top:24px;border-top:1px solid #EEE3EA">Propuesta</div>
+            <div style="display:grid;gap:18px">
+              <div><label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Nombre de la propuesta</label><input placeholder="Ej. Sensa · monitoreo agrícola con IA" style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px" /></div>
+              <div><label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Tecnología emergente principal</label>
+                <div style="display:flex;flex-wrap:wrap;gap:9px">
+                  <sc-for list="{{ techs }}" as="t" hint-placeholder-count="5">
+                    <button style="border:1px solid #E2CDDA;background:#fff;padding:8px 13px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;cursor:pointer;color:#26212E" style-hover="border-color:#D6336C;color:#D6336C">{{ t }}</button>
+                  </sc-for>
+                </div>
+              </div>
+              <div><label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Problema u oportunidad que resuelve</label><textarea rows="4" placeholder="Máximo 800 caracteres" style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px;resize:vertical"></textarea><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#736C7B;margin-top:6px;text-align:right">0 / 800</div></div>
+              <div><label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Impacto social esperado</label><textarea rows="4" placeholder="Máximo 800 caracteres" style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px;resize:vertical"></textarea><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#736C7B;margin-top:6px;text-align:right">0 / 800</div></div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-top:22px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#736C7B">Guardado automático · hace 2 min</div>
+            <div style="display:flex;gap:10px">
+              <button style="background:#fff;color:#26212E;border:1px solid #E2CDDA;padding:12px 18px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer" style-hover="border-color:#D6336C">Guardar borrador</button>
+              <button onClick="{{ goDocs }}" style="background:#D6336C;color:#fff;border:1px solid #D6336C;padding:12px 20px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer" style-hover="background:#8A1F49;border-color:#8A1F49">Continuar a documentos →</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ================= APLICANTE · PASO 2 DOCUMENTOS ================= -->
+      <sc-if value="{{ isDocs }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:980px;padding:38px 32px 64px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#736C7B">Aplicación · paso 2 de 4</div>
+          <h2 style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:38px;text-transform:uppercase;margin:6px 0 8px">Documentos</h2>
+          <p style="font-size:14px;color:#736C7B;margin:0 0 28px;max-width:64ch">PDF de hasta 10 MB por archivo. Los documentos oficiales deben estar emitidos por tu institución.</p>
+
+          <div style="display:grid;gap:14px">
+            <sc-for list="{{ docs }}" as="d" hint-placeholder-count="5">
+              <div style="background:#fff;border:1px solid #EEE3EA;padding:20px 22px;display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center">
+                <div>
+                  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+                    <span style="font-size:15px;font-weight:600">{{ d.name }}</span>
+                    <sc-if value="{{ d.uploaded }}" hint-placeholder-val="{{ true }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;background:#DCEEEC;color:#1F5E5C;padding:4px 8px">Cargado</span></sc-if>
+                    <sc-if value="{{ d.missing }}" hint-placeholder-val="{{ false }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;background:#FBE1EC;color:#8A1F49;padding:4px 8px">Falta</span></sc-if>
+                  </div>
+                  <div style="font-size:13px;color:#736C7B;margin-top:6px;line-height:1.5">{{ d.desc }}</div>
+                  <sc-if value="{{ d.uploaded }}" hint-placeholder-val="{{ true }}">
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#26212E;margin-top:10px;display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+                      <span>{{ d.file }}</span>
+                      <a href="#ver">Ver</a>
+                      <a href="#reemplazar">Reemplazar</a>
+                    </div>
+                  </sc-if>
+                </div>
+                <sc-if value="{{ d.missing }}" hint-placeholder-val="{{ false }}">
+                  <button style="background:#fff;border:1px dashed #D6336C;color:#D6336C;padding:14px 20px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap" style-hover="background:#FBE1EC">Subir PDF</button>
+                </sc-if>
+                <sc-if value="{{ d.uploaded }}" hint-placeholder-val="{{ true }}">
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#736C7B;white-space:nowrap">{{ d.size }}</span>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="background:#DCEEEC;border:1px solid #C4E2DF;padding:18px 22px;margin-top:20px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between">
+            <div style="font-size:13.5px;color:#26212E">Descarga el formato oficial de <strong>carta compromiso ANUIES</strong> antes de firmarla.</div>
+            <a href="#formato" style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#1F5E5C;border:1px solid #1F5E5C;padding:9px 15px">Descargar formato</a>
+          </div>
+
+          <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;margin-top:22px">
+            <button onClick="{{ goDatos }}" style="background:#fff;color:#26212E;border:1px solid #E2CDDA;padding:12px 18px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">← Datos</button>
+            <button onClick="{{ goVideo }}" style="background:#D6336C;color:#fff;border:1px solid #D6336C;padding:12px 20px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer" style-hover="background:#8A1F49;border-color:#8A1F49">Continuar a video →</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ================= APLICANTE · PASO 3 VIDEO ================= -->
+      <sc-if value="{{ isVideo }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:980px;padding:38px 32px 64px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#736C7B">Aplicación · paso 3 de 4</div>
+          <h2 style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:38px;text-transform:uppercase;margin:6px 0 8px">Videos</h2>
+          <p style="font-size:14px;color:#736C7B;margin:0 0 28px;max-width:64ch">Sube tus archivos MP4 o MOV directamente a la plataforma. Máximo 500 MB por video.</p>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:22px;align-items:start">
+
+            <div style="background:#fff;border:1px solid #EEE3EA;padding:24px">
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:6px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#D6336C">Obligatorio</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;background:#DCEEEC;color:#1F5E5C;padding:4px 8px">Cargado</span>
+              </div>
+              <h3 style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:24px;text-transform:uppercase;margin:0 0 4px">Video de propuesta</h3>
+              <p style="font-size:13px;color:#736C7B;margin:0 0 18px">Máximo 90 segundos. Problema, solución y tecnología emergente.</p>
+              <div style="aspect-ratio:16/9;background:#26212E;display:grid;place-items:center;position:relative">
+                <div style="width:52px;height:52px;border:1px solid #FF6FA5;display:grid;place-items:center;color:#FF6FA5;font-size:16px">▶</div>
+                <div style="position:absolute;bottom:10px;left:12px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#B9AEC2">01:24 / 01:30</div>
+              </div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#26212E;margin-top:14px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between">
+                <span>propuesta_sensa.mp4 · 148 MB</span>
+                <a href="#reemplazar">Reemplazar</a>
+              </div>
+              <div style="margin-top:16px;padding-top:16px;border-top:1px solid #EEE3EA">
+                <label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Resumen de la propuesta (opcional)</label>
+                <textarea rows="3" placeholder="Dos o tres líneas que acompañen tu video" style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px;resize:vertical"></textarea>
+              </div>
+            </div>
+
+            <div style="background:#fff;border:1px solid #EEE3EA;padding:24px">
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:6px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#2F7A78">Recomendado</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;background:#FBE1EC;color:#8A1F49;padding:4px 8px">Falta</span>
+              </div>
+              <h3 style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:24px;text-transform:uppercase;margin:0 0 4px">Video de presentación</h3>
+              <p style="font-size:13px;color:#736C7B;margin:0 0 18px">Hasta 60 segundos. Quién eres, qué estudias y por qué quieres participar.</p>
+              <div style="aspect-ratio:16/9;border:1px dashed #D6336C;background:#FBF5F8;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;padding:20px;text-align:center">
+                <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;text-transform:uppercase;color:#8A1F49">Arrastra tu video aquí</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#736C7B">MP4 · MOV · máx. 500 MB</div>
+                <button style="background:#D6336C;color:#fff;border:0;padding:10px 18px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">Seleccionar archivo</button>
+              </div>
+              <div style="margin-top:18px;background:#FBF5F8;border:1px solid #EEE3EA;padding:14px">
+                <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#736C7B;margin-bottom:8px"><span>Subiendo · presentacion.mov</span><span>62%</span></div>
+                <div style="height:5px;background:#EEE3EA"><div style="width:62%;height:5px;background:#2F7A78"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;margin-top:22px">
+            <button onClick="{{ goDocs }}" style="background:#fff;color:#26212E;border:1px solid #E2CDDA;padding:12px 18px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">← Documentos</button>
+            <button onClick="{{ goReview }}" style="background:#D6336C;color:#fff;border:1px solid #D6336C;padding:12px 20px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer" style-hover="background:#8A1F49;border-color:#8A1F49">Revisar y enviar →</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ================= APLICANTE · PASO 4 REVISIÓN Y ENVÍO ================= -->
+      <sc-if value="{{ isReview }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:980px;padding:38px 32px 64px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#736C7B">Aplicación · paso 4 de 4</div>
+          <h2 style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:38px;text-transform:uppercase;margin:6px 0 22px">Revisión y envío</h2>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px;align-items:start">
+            <div style="background:#fff;border:1px solid #EEE3EA;padding:24px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:18px">Checklist de requisitos</div>
+              <div style="display:grid;gap:0">
+                <sc-for list="{{ checklist }}" as="c" hint-placeholder-count="7">
+                  <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #EEE3EA">
+                    <sc-if value="{{ c.ok }}" hint-placeholder-val="{{ true }}"><span style="width:18px;height:18px;flex:none;background:#DCEEEC;color:#1F5E5C;display:grid;place-items:center;font-size:11px">✓</span></sc-if>
+                    <sc-if value="{{ c.pending }}" hint-placeholder-val="{{ false }}"><span style="width:18px;height:18px;flex:none;background:#FBE1EC;color:#8A1F49;display:grid;place-items:center;font-size:11px">!</span></sc-if>
+                    <div>
+                      <div style="font-size:13.5px;font-weight:500">{{ c.label }}</div>
+                      <div style="font-size:12.5px;color:#736C7B;margin-top:2px">{{ c.note }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="display:grid;gap:22px">
+              <div style="background:#FBE1EC;border:1px solid #F3CFDF;padding:24px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#8A1F49;margin-bottom:12px">Antes de enviar</div>
+                <p style="font-size:13.5px;line-height:1.6;margin:0 0 16px;color:#26212E">Una vez enviada, tu aplicación entra al periodo de evaluación (16 — 22 nov) y no podrá editarse. Puedes seguir guardando borradores hasta el cierre.</p>
+                <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;margin-bottom:18px"><input type="checkbox" style="accent-color:#D6336C;margin-top:3px" /> <span>Declaro que la información y los documentos son verídicos.</span></label>
+                <button style="width:100%;background:#D6336C;color:#fff;border:0;padding:14px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer" style-hover="background:#8A1F49">Enviar aplicación →</button>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8A1F49;margin-top:12px;text-align:center">Folio provisional: A4MX-2026-0184</div>
+              </div>
+              <div style="background:#fff;border:1px solid #EEE3EA;padding:24px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:14px">Resumen</div>
+                <div style="display:grid;gap:10px;font-size:13px">
+                  <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#736C7B">Propuesta</span><strong>Sensa</strong></div>
+                  <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#736C7B">Tecnología</span><strong>Inteligencia Artificial</strong></div>
+                  <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#736C7B">Universidad</span><strong>UNAM</strong></div>
+                  <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#736C7B">Promedio</span><strong>9.4</strong></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ================= APLICANTE · RESULTADO ================= -->
+      <sc-if value="{{ isResult }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:980px;padding:38px 32px 64px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#736C7B">Resultados · publicados 23 NOV 2026</div>
+          <h2 style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:38px;text-transform:uppercase;margin:6px 0 24px">Evaluación de mi aplicación</h2>
+
+          <div style="background:#26212E;color:#F3EAF0;padding:32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:28px;align-items:center;margin-bottom:24px">
+            <div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#5FD6CD">Resultado</div>
+              <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:44px;line-height:1;text-transform:uppercase;margin-top:8px">Seleccionada</div>
+              <p style="font-size:13.5px;color:#B9AEC2;margin:12px 0 0;line-height:1.6">Tu propuesta fue elegida para el Reto ANUIES4MX en Valle de Bravo, 13 — 18 DIC 2026. Confirma tu participación antes del 30 de noviembre.</p>
+            </div>
+            <div style="display:flex;gap:24px;align-items:baseline;justify-content:flex-end;flex-wrap:wrap">
+              <div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#B9AEC2">Puntaje final</div>
+                <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:56px;line-height:1;color:#FF6FA5">4.4<span style="font-size:22px;color:#B9AEC2"> / 5</span></div>
+              </div>
+              <div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#B9AEC2">Folio</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:15px;margin-top:6px">A4MX-2026-0184</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1px solid #EEE3EA;padding:26px;margin-bottom:22px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:20px">Calificación por criterio · escala 1 a 5</div>
+            <div style="display:grid;gap:18px">
+              <sc-for list="{{ criterios }}" as="c" hint-placeholder-count="5">
+                <div style="display:grid;grid-template-columns:1fr 130px 44px;gap:16px;align-items:center;padding-bottom:16px;border-bottom:1px solid #EEE3EA">
+                  <div>
+                    <div style="font-size:14px;font-weight:600">{{ c.name }}</div>
+                    <div style="font-size:12.5px;color:#736C7B;margin-top:3px;line-height:1.5">{{ c.desc }}</div>
+                  </div>
+                  <div style="display:flex;gap:4px">
+                    <sc-for list="{{ c.dots }}" as="d" hint-placeholder-count="5">
+                      <sc-if value="{{ d.on }}" hint-placeholder-val="{{ true }}"><span style="flex:1;height:22px;background:#D6336C"></span></sc-if>
+                      <sc-if value="{{ d.off }}" hint-placeholder-val="{{ false }}"><span style="flex:1;height:22px;background:#EEE3EA"></span></sc-if>
+                    </sc-for>
+                  </div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600;text-align:right;color:#26212E">{{ c.score }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px">
+            <div style="background:#fff;border:1px solid #EEE3EA;padding:26px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#D6336C;margin-bottom:14px">Fortalezas señaladas por el comité</div>
+              <p style="font-size:13.5px;line-height:1.7;margin:0;color:#26212E;text-wrap:pretty">El problema está delimitado con datos concretos del campo mexicano y la aplicación de visión por computadora es pertinente al contexto rural. El video comunica la propuesta con claridad dentro del tiempo permitido.</p>
+            </div>
+            <div style="background:#DCEEEC;border:1px solid #C4E2DF;padding:26px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#1F5E5C;margin-bottom:14px">Áreas de oportunidad</div>
+              <p style="font-size:13.5px;line-height:1.7;margin:0;color:#26212E;text-wrap:pretty">El modelo de ingresos requiere mayor detalle: no se especifica el costo del hardware ni la vía de adopción con productores. Trabaja este punto antes del Demo Day.</p>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ================= APLICANTE · CONFIRMACIÓN ================= -->
+      <sc-if value="{{ isConfirm }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:860px;padding:38px 32px 64px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#736C7B">Confirmación de participación · 24 — 30 NOV 2026</div>
+          <h2 style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:38px;text-transform:uppercase;margin:6px 0 8px">Confirma tu lugar</h2>
+          <p style="font-size:14px;color:#736C7B;margin:0 0 26px;max-width:64ch">La beca cubre participación en el programa, hospedaje y alimentación en el Centro de Capacitación ANUIES Valle de Bravo del 13 al 18 de diciembre de 2026.</p>
+
+          <div style="background:#fff;border:1px solid #EEE3EA;padding:28px">
+            <div style="display:grid;gap:16px">
+              <label style="display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.55"><input type="checkbox" style="accent-color:#D6336C;margin-top:3px" /> <span><strong>Confirmo mi participación</strong> presencial y residencial durante los cinco días del programa.</span></label>
+              <label style="display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.55"><input type="checkbox" style="accent-color:#D6336C;margin-top:3px" /> <span>Acepto los términos de la beca y el reglamento del Centro de Capacitación ANUIES.</span></label>
+            </div>
+
+            <div style="margin:26px 0 0;padding-top:24px;border-top:1px solid #EEE3EA">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#D6336C;margin-bottom:18px">Datos logísticos</div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px">
+                <div><label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Ciudad de origen</label><input placeholder="Ciudad de México" style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px" /></div>
+                <div><label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Requerimientos alimentarios</label><input placeholder="Vegetariana, alergias…" style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px" /></div>
+                <div><label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Contacto de emergencia</label><input placeholder="Nombre y teléfono" style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px" /></div>
+                <div><label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Talla de playera</label><select style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px;background:#fff"><option>S</option><option>M</option><option>L</option><option>XL</option></select></div>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:26px">
+              <button style="background:#D6336C;color:#fff;border:0;padding:13px 22px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer" style-hover="background:#8A1F49">Confirmar participación →</button>
+              <button style="background:#fff;color:#736C7B;border:1px solid #E2CDDA;padding:13px 20px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">Declinar mi lugar</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ================= ANUIES / ADMIN · LISTA DE APLICACIONES ================= -->
+      <sc-if value="{{ isList }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:38px 32px 64px">
+          <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;margin-bottom:26px">
+            <div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#736C7B">{{ roleLabel }} · Edición 2026</div>
+              <h2 style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:38px;text-transform:uppercase;margin:6px 0 0">Aplicaciones</h2>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <sc-if value="{{ isAnuies }}" hint-placeholder-val="{{ false }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:#DCEEEC;color:#1F5E5C;padding:9px 13px">Solo lectura</span></sc-if>
+              <button style="background:#fff;border:1px solid #E2CDDA;color:#26212E;padding:10px 16px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer" style-hover="border-color:#D6336C">Exportar CSV</button>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:22px">
+            <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+              <div style="background:#fff;border:1px solid #EEE3EA;padding:18px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B">{{ k.label }}</div>
+                <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:34px;line-height:1.05;margin-top:8px;color:#26212E">{{ k.value }}</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#D6336C;margin-top:4px">{{ k.note }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="background:#fff;border:1px solid #EEE3EA">
+            <div style="display:flex;flex-wrap:wrap;gap:10px;padding:16px;border-bottom:1px solid #EEE3EA;align-items:center">
+              <input placeholder="Buscar por nombre, folio o universidad…" style="flex:1;min-width:200px;padding:10px 12px;border:1px solid #E2CDDA;font-size:13.5px" />
+              <select style="padding:10px 12px;border:1px solid #E2CDDA;font-size:13px;background:#fff"><option>Todos los estados</option><option>Enviada</option><option>En evaluación</option><option>Evaluada</option><option>Seleccionada</option><option>No seleccionada</option></select>
+              <select style="padding:10px 12px;border:1px solid #E2CDDA;font-size:13px;background:#fff"><option>Todas las universidades</option><option>UNAM</option><option>IPN</option><option>UdeG</option></select>
+              <select style="padding:10px 12px;border:1px solid #E2CDDA;font-size:13px;background:#fff"><option>Toda tecnología</option><option>IA</option><option>VR/AR</option><option>Robótica</option><option>Blockchain</option><option>Cloud</option></select>
+            </div>
+
+            <div style="overflow-x:auto">
+              <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:860px">
+                <thead>
+                  <tr style="background:#FBF5F8">
+                    <th style="text-align:left;padding:12px 16px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#736C7B;font-weight:500;border-bottom:1px solid #EEE3EA">Folio</th>
+                    <th style="text-align:left;padding:12px 16px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#736C7B;font-weight:500;border-bottom:1px solid #EEE3EA">Aplicante</th>
+                    <th style="text-align:left;padding:12px 16px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#736C7B;font-weight:500;border-bottom:1px solid #EEE3EA">Universidad</th>
+                    <th style="text-align:left;padding:12px 16px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#736C7B;font-weight:500;border-bottom:1px solid #EEE3EA">Tecnología</th>
+                    <th style="text-align:left;padding:12px 16px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#736C7B;font-weight:500;border-bottom:1px solid #EEE3EA">Prom.</th>
+                    <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}"><th style="text-align:left;padding:12px 16px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#736C7B;font-weight:500;border-bottom:1px solid #EEE3EA">IA</th></sc-if>
+                    <th style="text-align:left;padding:12px 16px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#736C7B;font-weight:500;border-bottom:1px solid #EEE3EA">Comité</th>
+                    <th style="text-align:left;padding:12px 16px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#736C7B;font-weight:500;border-bottom:1px solid #EEE3EA">Estado</th>
+                    <th style="border-bottom:1px solid #EEE3EA"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <sc-for list="{{ apps }}" as="a" hint-placeholder-count="8">
+                    <tr style="border-bottom:1px solid #EEE3EA" style-hover="background:#FBF5F8">
+                      <td style="padding:13px 16px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#736C7B;white-space:nowrap">{{ a.folio }}</td>
+                      <td style="padding:13px 16px;font-weight:500;white-space:nowrap">{{ a.name }}</td>
+                      <td style="padding:13px 16px;color:#736C7B;white-space:nowrap">{{ a.uni }}</td>
+                      <td style="padding:13px 16px;color:#736C7B;white-space:nowrap">{{ a.tech }}</td>
+                      <td style="padding:13px 16px;font-family:'IBM Plex Mono',monospace;font-size:12px">{{ a.gpa }}</td>
+                      <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}"><td style="padding:13px 16px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#2F7A78">{{ a.ai }}</td></sc-if>
+                      <td style="padding:13px 16px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600">{{ a.human }}</td>
+                      <td style="padding:13px 16px;white-space:nowrap">
+                        <sc-if value="{{ a.isDone }}" hint-placeholder-val="{{ true }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;background:#DCEEEC;color:#1F5E5C;padding:4px 8px">{{ a.status }}</span></sc-if>
+                        <sc-if value="{{ a.isOpen }}" hint-placeholder-val="{{ false }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;background:#FBE1EC;color:#8A1F49;padding:4px 8px">{{ a.status }}</span></sc-if>
+                      </td>
+                      <td style="padding:13px 16px;text-align:right;white-space:nowrap"><button onClick="{{ a.onOpen }}" style="background:transparent;border:1px solid #E2CDDA;color:#26212E;padding:6px 12px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer" style-hover="border-color:#D6336C;color:#D6336C">{{ openLabel }}</button></td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+
+            <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding:16px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#736C7B">
+              <span>Mostrando 1 — 8 de 342 aplicaciones</span>
+              <div style="display:flex;gap:6px">
+                <button style="border:1px solid #E2CDDA;background:#fff;padding:7px 12px;font-family:inherit;font-size:11px;cursor:pointer;color:#736C7B">←</button>
+                <button style="border:1px solid #D6336C;background:#D6336C;color:#fff;padding:7px 12px;font-family:inherit;font-size:11px;cursor:pointer">1</button>
+                <button style="border:1px solid #E2CDDA;background:#fff;padding:7px 12px;font-family:inherit;font-size:11px;cursor:pointer;color:#26212E">2</button>
+                <button style="border:1px solid #E2CDDA;background:#fff;padding:7px 12px;font-family:inherit;font-size:11px;cursor:pointer;color:#26212E">3</button>
+                <button style="border:1px solid #E2CDDA;background:#fff;padding:7px 12px;font-family:inherit;font-size:11px;cursor:pointer;color:#26212E">→</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ================= DETALLE / EVALUAR ================= -->
+      <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:38px 32px 64px">
+          <button onClick="{{ goList }}" style="background:transparent;border:0;color:#736C7B;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;padding:0;margin-bottom:16px">← Todas las aplicaciones</button>
+
+          <div style="display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;justify-content:space-between;margin-bottom:26px">
+            <div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;color:#736C7B">A4MX-2026-0184 · enviada 12 NOV 2026</div>
+              <h2 style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:38px;text-transform:uppercase;margin:6px 0 4px">Ana Sofía Márquez Duarte</h2>
+              <div style="font-size:14px;color:#736C7B">UNAM · Ing. Mecatrónica · 6º semestre · Promedio 9.4</div>
+            </div>
+            <div style="display:flex;gap:22px;flex-wrap:wrap">
+              <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+                <div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B">Score IA</div>
+                  <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:38px;line-height:1;color:#2F7A78">4.2</div>
+                </div>
+              </sc-if>
+              <div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B">Score comité</div>
+                <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:38px;line-height:1;color:#D6336C">4.4</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px;align-items:start">
+
+            <div style="display:grid;gap:22px">
+              <div style="background:#fff;border:1px solid #EEE3EA;padding:24px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:16px">Video de propuesta · 01:24</div>
+                <div style="aspect-ratio:16/9;background:#26212E;display:grid;place-items:center">
+                  <div style="width:52px;height:52px;border:1px solid #FF6FA5;display:grid;place-items:center;color:#FF6FA5;font-size:16px">▶</div>
+                </div>
+                <div style="margin-top:14px;font-size:14px"><strong>Sensa</strong> · monitoreo agrícola con visión por computadora</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;background:#FBE1EC;color:#8A1F49;padding:6px 11px">Inteligencia Artificial</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;background:#DCEEEC;color:#1F5E5C;padding:6px 11px">Impacto rural</span>
+                </div>
+              </div>
+
+              <div style="background:#fff;border:1px solid #EEE3EA;padding:24px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:16px">Documentos</div>
+                <div style="display:grid;gap:0">
+                  <sc-for list="{{ docs }}" as="d" hint-placeholder-count="5">
+                    <div style="display:flex;gap:12px;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid #EEE3EA">
+                      <span style="font-size:13.5px">{{ d.name }}</span>
+                      <sc-if value="{{ d.uploaded }}" hint-placeholder-val="{{ true }}"><a href="#ver" style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase">Ver PDF</a></sc-if>
+                      <sc-if value="{{ d.missing }}" hint-placeholder-val="{{ false }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#8A1F49">No entregado</span></sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <div style="background:#fff;border:1px solid #EEE3EA;padding:24px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:16px">Propuesta escrita</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#D6336C">Problema u oportunidad</div>
+                <p style="font-size:13.5px;line-height:1.7;margin:8px 0 18px;color:#26212E">Los pequeños productores del Estado de México detectan plagas de forma tardía, con pérdidas de hasta 30% de la cosecha. No existen herramientas de diagnóstico accesibles en campo.</p>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#D6336C">Impacto social esperado</div>
+                <p style="font-size:13.5px;line-height:1.7;margin:8px 0 0;color:#26212E">Reducir pérdidas de cosecha en unidades de producción familiar mediante diagnóstico temprano desde un teléfono, sin conexión permanente a internet.</p>
+              </div>
+            </div>
+
+            <div style="display:grid;gap:22px">
+
+              <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#26212E;color:#F3EAF0;padding:24px">
+                  <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;margin-bottom:18px">
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#5FD6CD">Evaluación por IA</div>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;border:1px solid rgba(95,214,205,.4);color:#5FD6CD;padding:4px 8px">Solo admin</span>
+                  </div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#B9AEC2;margin-bottom:8px">Resumen automático</div>
+                  <p style="font-size:13px;line-height:1.7;color:#F3EAF0;margin:0 0 22px">App móvil que usa visión por computadora para detectar plagas en cultivos de maíz desde fotografías, con modelo ligero para operar sin conexión. Mercado inicial: productores familiares del Estado de México.</p>
+
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#B9AEC2;margin-bottom:12px">Score por criterio con justificación</div>
+                  <div style="display:grid;gap:14px">
+                    <sc-for list="{{ aiScores }}" as="a" hint-placeholder-count="5">
+                      <div style="border-bottom:1px solid rgba(243,234,240,.12);padding-bottom:14px">
+                        <div style="display:flex;gap:12px;justify-content:space-between;align-items:baseline">
+                          <span style="font-size:13px;font-weight:500">{{ a.name }}</span>
+                          <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;color:#5FD6CD">{{ a.score }}</span>
+                        </div>
+                        <p style="font-size:12.5px;line-height:1.6;color:#B9AEC2;margin:6px 0 0">{{ a.why }}</p>
+                      </div>
+                    </sc-for>
+                  </div>
+
+                  <div style="margin-top:22px;padding-top:20px;border-top:1px solid rgba(243,234,240,.12)">
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#B9AEC2;margin-bottom:12px">Verificación de requisitos</div>
+                    <div style="display:grid;gap:9px">
+                      <sc-for list="{{ checks }}" as="c" hint-placeholder-count="4">
+                        <div style="display:flex;gap:10px;align-items:center;font-size:12.5px">
+                          <sc-if value="{{ c.ok }}" hint-placeholder-val="{{ true }}"><span style="width:16px;height:16px;flex:none;background:#5FD6CD;color:#26212E;display:grid;place-items:center;font-size:10px">✓</span></sc-if>
+                          <sc-if value="{{ c.warn }}" hint-placeholder-val="{{ false }}"><span style="width:16px;height:16px;flex:none;background:#FF6FA5;color:#26212E;display:grid;place-items:center;font-size:10px">!</span></sc-if>
+                          <span>{{ c.label }}</span>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </div>
+              </sc-if>
+
+              <div style="background:#fff;border:1px solid #EEE3EA;padding:24px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:18px">Calificaciones del comité</div>
+                <div style="display:grid;gap:0">
+                  <sc-for list="{{ evaluadores }}" as="e" hint-placeholder-count="3">
+                    <div style="padding:14px 0;border-bottom:1px solid #EEE3EA">
+                      <div style="display:flex;gap:12px;justify-content:space-between;align-items:baseline">
+                        <div>
+                          <div style="font-size:13.5px;font-weight:600">{{ e.name }}</div>
+                          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#736C7B;margin-top:2px">{{ e.org }}</div>
+                        </div>
+                        <span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#D6336C">{{ e.score }}</span>
+                      </div>
+                      <p style="font-size:12.5px;line-height:1.6;color:#736C7B;margin:8px 0 0">{{ e.comment }}</p>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:baseline;padding-top:16px">
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B">Promedio comité</span>
+                  <span style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:28px;color:#26212E">4.4 / 5</span>
+                </div>
+              </div>
+
+              <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#fff;border:1px solid #D6336C;padding:24px">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#D6336C;margin-bottom:18px">Mi evaluación · escala 1 a 5</div>
+                  <div style="display:grid;gap:18px">
+                    <sc-for list="{{ criterios }}" as="c" hint-placeholder-count="5">
+                      <div>
+                        <div style="font-size:13.5px;font-weight:500;margin-bottom:9px">{{ c.name }}</div>
+                        <div style="display:flex;gap:7px">
+                          <sc-for list="{{ c.scale }}" as="v" hint-placeholder-count="5">
+                            <button style="flex:1;border:1px solid #E2CDDA;background:#fff;padding:9px 0;font-family:'IBM Plex Mono',monospace;font-size:13px;cursor:pointer;color:#26212E" style-hover="border-color:#D6336C;background:#FBE1EC;color:#8A1F49">{{ v }}</button>
+                          </sc-for>
+                        </div>
+                      </div>
+                    </sc-for>
+                    <div>
+                      <label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Comentario para la aplicante</label>
+                      <textarea rows="4" placeholder="Fortalezas y áreas de oportunidad. Este texto se publica con el resultado." style="width:100%;padding:11px 12px;border:1px solid #E2CDDA;font-size:14px;resize:vertical"></textarea>
+                    </div>
+                    <div>
+                      <label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:7px">Dictamen</label>
+                      <div style="display:flex;gap:9px;flex-wrap:wrap">
+                        <button style="flex:1;min-width:120px;border:1px solid #E2CDDA;background:#fff;padding:11px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;color:#26212E" style-hover="border-color:#2F7A78;color:#1F5E5C">Seleccionada</button>
+                        <button style="flex:1;min-width:120px;border:1px solid #E2CDDA;background:#fff;padding:11px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;color:#26212E" style-hover="border-color:#D6336C;color:#8A1F49">Lista de espera</button>
+                        <button style="flex:1;min-width:120px;border:1px solid #E2CDDA;background:#fff;padding:11px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;color:#26212E" style-hover="border-color:#736C7B">No seleccionada</button>
+                      </div>
+                    </div>
+                    <button style="background:#D6336C;color:#fff;border:0;padding:14px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer" style-hover="background:#8A1F49">Guardar evaluación →</button>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ isAnuies }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#DCEEEC;border:1px solid #C4E2DF;padding:22px">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#1F5E5C;margin-bottom:10px">Acceso ANUIES</div>
+                  <p style="font-size:13px;line-height:1.65;margin:0;color:#26212E">Este perfil consulta aplicaciones y calificaciones del comité. La evaluación por IA y la captura de puntajes corresponden al rol administrador.</p>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ================= ADMIN · PANEL ================= -->
+      <sc-if value="{{ isPanel }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:1140px;padding:38px 32px 64px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#736C7B">Administración · Edición 2026</div>
+          <h2 style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:40px;text-transform:uppercase;margin:6px 0 26px">Panel general</h2>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px">
+            <sc-for list="{{ adminKpis }}" as="k" hint-placeholder-count="5">
+              <div style="background:#fff;border:1px solid #EEE3EA;padding:20px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B">{{ k.label }}</div>
+                <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:36px;line-height:1.05;margin-top:8px">{{ k.value }}</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#D6336C;margin-top:4px">{{ k.note }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px;align-items:start">
+            <div style="background:#fff;border:1px solid #EEE3EA;padding:24px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:20px">Avance de evaluación</div>
+              <div style="display:grid;gap:16px">
+                <sc-for list="{{ progress }}" as="p" hint-placeholder-count="4">
+                  <div>
+                    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px"><span>{{ p.label }}</span><span style="font-family:'IBM Plex Mono',monospace;color:#736C7B">{{ p.value }}</span></div>
+                    <div style="height:8px;background:#EEE3EA"><div style="height:8px;background:#D6336C;width:{{ p.pct }}"></div></div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="margin-top:24px;padding-top:20px;border-top:1px solid #EEE3EA;display:flex;flex-wrap:wrap;gap:10px">
+                <button style="background:#26212E;color:#F3EAF0;border:0;padding:11px 18px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">Ejecutar evaluación IA pendiente</button>
+                <button style="background:#fff;border:1px solid #E2CDDA;color:#26212E;padding:11px 18px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">Publicar resultados</button>
+              </div>
+            </div>
+
+            <div style="display:grid;gap:22px">
+              <div style="background:#fff;border:1px solid #EEE3EA;padding:24px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#736C7B;margin-bottom:18px">Aplicaciones por tecnología</div>
+                <div style="display:grid;gap:12px">
+                  <sc-for list="{{ techStats }}" as="t" hint-placeholder-count="5">
+                    <div style="display:grid;grid-template-columns:1fr 60px;gap:12px;align-items:center">
+                      <div>
+                        <div style="font-size:13px;margin-bottom:6px">{{ t.label }}</div>
+                        <div style="height:6px;background:#EEE3EA"><div style="height:6px;background:#2F7A78;width:{{ t.pct }}"></div></div>
+                      </div>
+                      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;text-align:right;color:#736C7B">{{ t.n }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="background:#26212E;color:#F3EAF0;padding:24px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#5FD6CD;margin-bottom:14px">Calendario</div>
+                <div style="display:grid;gap:12px;font-size:13px">
+                  <div style="display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid rgba(243,234,240,.12);padding-bottom:10px"><span>Cierre de recepción</span><span style="font-family:'IBM Plex Mono',monospace;color:#B9AEC2">15 NOV</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid rgba(243,234,240,.12);padding-bottom:10px"><span>Evaluación</span><span style="font-family:'IBM Plex Mono',monospace;color:#B9AEC2">16 — 22 NOV</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid rgba(243,234,240,.12);padding-bottom:10px"><span>Publicación de resultados</span><span style="font-family:'IBM Plex Mono',monospace;color:#B9AEC2">23 NOV</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:14px"><span style="color:#FF6FA5">Reto presencial</span><span style="font-family:'IBM Plex Mono',monospace;color:#FF6FA5">13 — 18 DIC</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ================= ADMIN · EQUIPOS DEMO DAY ================= -->
+      <sc-if value="{{ isTeams }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:1140px;padding:38px 32px 64px">
+          <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;margin-bottom:26px">
+            <div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#736C7B">Demo Day · 18 DIC 2026</div>
+              <h2 style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:40px;text-transform:uppercase;margin:6px 0 0">Equipos</h2>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button style="background:#fff;border:1px solid #E2CDDA;color:#26212E;padding:11px 16px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">Sugerir equipos con IA</button>
+              <button style="background:#D6336C;color:#fff;border:0;padding:11px 18px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">Nuevo equipo +</button>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;align-items:start">
+            <sc-for list="{{ teams }}" as="t" hint-placeholder-count="4">
+              <div style="background:#fff;border:1px solid #EEE3EA;padding:22px">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+                  <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:24px;text-transform:uppercase">{{ t.name }}</div>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;background:#FBE1EC;color:#8A1F49;padding:4px 8px">{{ t.tech }}</span>
+                </div>
+                <div style="display:grid;gap:0;margin-top:14px">
+                  <sc-for list="{{ t.members }}" as="m" hint-placeholder-count="4">
+                    <div style="display:flex;gap:11px;align-items:center;padding:9px 0;border-bottom:1px solid #EEE3EA">
+                      <span style="width:26px;height:26px;flex:none;background:#FBF5F8;color:#8A1F49;display:grid;place-items:center;font-family:'IBM Plex Mono',monospace;font-size:10px">{{ m.ini }}</span>
+                      <div style="min-width:0">
+                        <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.name }}</div>
+                        <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:#736C7B">{{ m.uni }}</div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#736C7B">
+                  <span>{{ t.count }} integrantes</span>
+                  <a href="#editar">Editar</a>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+    </main>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;initialRole&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;auth&quot;,&quot;aplicante&quot;,&quot;anuies&quot;,&quot;admin&quot;],&quot;default&quot;:&quot;auth&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Vista&quot;}}">
+class Component extends DCLogic {
+  state = { role: null, view: null };
+
+  get role() { return this.state.role || this.props.initialRole || 'aplicante'; }
+
+  navFor(role) {
+    if (role === 'auth') return [['login', 'Iniciar sesión'], ['signup', 'Registro']];
+    if (role === 'aplicante') return [['dash', 'Mi convocatoria'], ['datos', '1 · Datos'], ['docs', '2 · Documentos'], ['video', '3 · Videos'], ['review', '4 · Revisión y envío'], ['result', 'Resultado'], ['confirm', 'Confirmación']];
+    if (role === 'anuies') return [['list', 'Aplicaciones'], ['detail', 'Detalle de aplicación']];
+    return [['panel', 'Panel general'], ['list', 'Aplicaciones'], ['detail', 'Evaluar aplicación'], ['teams', 'Equipos Demo Day']];
+  }
+
+  get view() {
+    const nav = this.navFor(this.role);
+    const v = this.state.view;
+    return nav.some(n => n[0] === v) ? v : nav[0][0];
+  }
+
+  setRole = (role) => this.setState({ role, view: this.navFor(role)[0][0] });
+  go = (view) => () => this.setState({ view });
+
+  dots(score) {
+    return [1, 2, 3, 4, 5].map(i => ({ on: i <= Math.round(score), off: i > Math.round(score) }));
+  }
+
+  renderVals() {
+    const role = this.role, view = this.view;
+    const nav = this.navFor(role);
+    const roleLabels = { auth: 'Acceso', aplicante: 'Aplicante', anuies: 'ANUIES', admin: 'Administrador' };
+    const users = { aplicante: 'Ana Sofía Márquez', anuies: 'Comité ANUIES', admin: 'Dirección del programa', auth: '' };
+    const initials = { aplicante: 'AM', anuies: 'CA', admin: 'DP', auth: '' };
+
+    const criterios = [
+      { name: 'Claridad de la idea de negocio', desc: 'Identificación del problema u oportunidad y de la solución.', score: 5 },
+      { name: 'Innovación y relevancia tecnológica', desc: 'Uso innovador de IA, VR/AR, Robótica, Blockchain o Cloud.', score: 4 },
+      { name: 'Impacto social', desc: 'Potencial de cambio significativo y medible.', score: 5 },
+      { name: 'Viabilidad técnica y económica', desc: 'Factibilidad de implementación y solidez del modelo.', score: 3 },
+      { name: 'Presentación del video', desc: 'Claridad, eficiencia comunicativa y creatividad.', score: 5 }
+    ].map(c => ({ ...c, dots: this.dots(c.score), scale: [1, 2, 3, 4, 5] }));
+
+    const docs = [
+      { name: 'Constancia de inscripción', desc: 'Emitida por tu universidad asociada a ANUIES.', ok: true, file: 'constancia_unam.pdf', size: '1.2 MB' },
+      { name: 'Relación de estudios oficial', desc: 'Con promedio global acumulado mínimo de 9.0.', ok: true, file: 'kardex_unam.pdf', size: '840 KB' },
+      { name: 'Carta compromiso ANUIES', desc: 'Formato oficial firmado.', ok: true, file: 'carta_compromiso.pdf', size: '410 KB' },
+      { name: 'Carta de respaldo institucional', desc: 'Firmada por tu universidad o institución educativa.', ok: false, file: '', size: '' },
+      { name: 'Currículum vitae', desc: 'Actualizado, máximo 2 páginas.', ok: false, file: '', size: '' }
+    ].map(d => ({ ...d, uploaded: d.ok, missing: !d.ok }));
+
+    const steps = [
+      { num: 'PASO 1', label: 'Datos personales y académicos', ok: true, view: 'datos' },
+      { num: 'PASO 2', label: 'Documentos', ok: false, view: 'docs' },
+      { num: 'PASO 3', label: 'Videos', ok: true, view: 'video' },
+      { num: 'PASO 4', label: 'Revisión y envío', ok: false, view: 'review' }
+    ].map(s => ({ ...s, done: s.ok, pending: !s.ok, onClick: this.go(s.view) }));
+
+    const wizard = [['1', 'Datos', 'datos'], ['2', 'Documentos', 'docs'], ['3', 'Videos', 'video'], ['4', 'Revisión', 'review']]
+      .map(w => ({ num: 'PASO ' + w[0], label: w[1], active: view === w[2], onClick: this.go(w[2]) }));
+
+    const timeline = [
+      { date: '07 SEP 2026', stage: 'Convocatoria abierta', note: 'Cuenta creada el 09 SEP', ok: true },
+      { date: '15 NOV 2026', stage: 'Cierre de recepción', note: '23:59 hrs. CST', ok: false },
+      { date: '16 — 22 NOV 2026', stage: 'Evaluación de aplicaciones', note: 'Comité y evaluación asistida', ok: false },
+      { date: '23 NOV 2026', stage: 'Publicación de resultados', note: '', ok: false },
+      { date: '24 — 30 NOV 2026', stage: 'Confirmación de participación', note: '', ok: false },
+      { date: '13 — 18 DIC 2026', stage: 'Reto ANUIES4MX presencial', note: 'Valle de Bravo, Estado de México', ok: false }
+    ].map(t => ({ ...t, done: t.ok, todo: !t.ok }));
+
+    const checklist = [
+      { label: 'Nivel superior, no último año', note: 'Declarado en el paso 1', ok: true },
+      { label: 'Promedio global mínimo 9.0', note: 'Registrado: 9.4', ok: true },
+      { label: 'Constancia de inscripción', note: 'constancia_unam.pdf', ok: true },
+      { label: 'Relación de estudios', note: 'kardex_unam.pdf', ok: true },
+      { label: 'Carta compromiso ANUIES', note: 'carta_compromiso.pdf', ok: true },
+      { label: 'Carta de respaldo institucional', note: 'Pendiente de subir', ok: false },
+      { label: 'Currículum vitae', note: 'Pendiente de subir', ok: false },
+      { label: 'Video de propuesta (≤ 90 s)', note: 'propuesta_sensa.mp4 · 01:24', ok: true }
+    ].map(c => ({ ...c, pending: !c.ok }));
+
+    const apps = [
+      ['A4MX-2026-0184', 'Ana Sofía Márquez', 'UNAM', 'IA', '9.4', '4.2', '4.4', 'Evaluada', true],
+      ['A4MX-2026-0183', 'Fernanda Ríos Pérez', 'IPN', 'Robótica', '9.1', '3.8', '3.9', 'Evaluada', true],
+      ['A4MX-2026-0182', 'Valeria Ocampo', 'UdeG', 'VR/AR', '9.7', '4.5', '—', 'En evaluación', false],
+      ['A4MX-2026-0181', 'Karla Jiménez Soto', 'UANL', 'Blockchain', '9.0', '3.4', '—', 'En evaluación', false],
+      ['A4MX-2026-0180', 'Renata Villalobos', 'BUAP', 'Cloud', '9.3', '4.0', '4.1', 'Evaluada', true],
+      ['A4MX-2026-0179', 'Diana Castañeda', 'UASLP', 'IA', '9.6', '4.6', '4.7', 'Evaluada', true],
+      ['A4MX-2026-0178', 'Mariana Ortiz Luna', 'TecNM', 'Robótica', '9.2', '—', '—', 'Enviada', false],
+      ['A4MX-2026-0177', 'Paola Beltrán', 'UV', 'IA', '9.5', '—', '—', 'Enviada', false]
+    ].map(a => ({
+      folio: a[0], name: a[1], uni: a[2], tech: a[3], gpa: a[4], ai: a[5], human: a[6], status: a[7],
+      isDone: a[8], isOpen: !a[8], onOpen: this.go('detail')
+    }));
+
+    const kpis = role === 'anuies'
+      ? [{ label: 'Aplicaciones recibidas', value: '342', note: '+18 esta semana' }, { label: 'Evaluadas', value: '196', note: '57% del total' }, { label: 'Promedio comité', value: '3.9', note: 'escala 1 — 5' }, { label: 'Universidades', value: '64', note: 'asociadas a ANUIES' }]
+      : [{ label: 'Aplicaciones', value: '342', note: '+18 esta semana' }, { label: 'Con IA procesada', value: '289', note: '53 pendientes' }, { label: 'Evaluadas por comité', value: '196', note: '57% del total' }, { label: 'Score promedio', value: '3.9', note: 'IA 4.0 · comité 3.9' }];
+
+    const adminKpis = [
+      { label: 'Aplicaciones', value: '342', note: '+18 esta semana' },
+      { label: 'Completas', value: '311', note: '31 incompletas' },
+      { label: 'IA procesada', value: '289', note: '53 pendientes' },
+      { label: 'Evaluadas', value: '196', note: '57%' },
+      { label: 'Lugares', value: '40', note: 'beca completa' }
+    ];
+
+    const progress = [
+      { label: 'Documentos verificados', value: '311 / 342', pct: '91%' },
+      { label: 'Evaluación IA', value: '289 / 342', pct: '84%' },
+      { label: 'Evaluación del comité', value: '196 / 342', pct: '57%' },
+      { label: 'Dictámenes cerrados', value: '120 / 342', pct: '35%' }
+    ];
+
+    const techStats = [
+      { label: 'Inteligencia Artificial', n: 141, pct: '82%' },
+      { label: 'Realidad Virtual / Aumentada', n: 58, pct: '34%' },
+      { label: 'Robótica', n: 54, pct: '31%' },
+      { label: 'Blockchain y Web3', n: 47, pct: '27%' },
+      { label: 'Cómputo en la Nube', n: 42, pct: '24%' }
+    ];
+
+    const aiScores = [
+      { name: 'Claridad de la idea de negocio', score: '4.5', why: 'Problema y solución explícitos en los primeros 20 segundos, con cifra de pérdida de cosecha.' },
+      { name: 'Innovación y relevancia tecnológica', score: '4.0', why: 'Visión por computadora en dispositivo; el enfoque offline es pertinente aunque no inédito.' },
+      { name: 'Impacto social', score: '4.5', why: 'Población objetivo definida y beneficio medible en productores familiares.' },
+      { name: 'Viabilidad técnica y económica', score: '3.5', why: 'No se detalla costo del hardware ni canal de adopción con productores.' },
+      { name: 'Presentación del video', score: '4.5', why: 'Duración 01:24 dentro del límite; audio claro y estructura ordenada.' }
+    ];
+
+    const checks = [
+      { label: 'Promedio 9.4 coincide con relación de estudios', ok: true },
+      { label: 'Constancia vigente de universidad ANUIES', ok: true },
+      { label: 'No cursa último año (6º de 9 semestres)', ok: true },
+      { label: 'Carta de respaldo y CV no entregados', ok: false }
+    ].map(c => ({ ...c, warn: !c.ok }));
+
+    const evaluadores = [
+      { name: 'Dra. Laura Mendieta', org: 'ANUIES', score: '4.6', comment: 'Propuesta bien delimitada y con evidencia del problema en campo.' },
+      { name: 'Ing. Hideo Tanaka', org: 'Mirai Innovation', score: '4.4', comment: 'La técnica es adecuada; falta claridad en el costo del dispositivo.' },
+      { name: 'Mtra. Rocío Salinas', org: 'Comité académico', score: '4.2', comment: 'Buena comunicación en video, modelo de negocio por desarrollar.' }
+    ];
+
+    const teams = [
+      { name: 'Equipo 01', tech: 'IA', members: [['AM', 'Ana Sofía Márquez', 'UNAM'], ['DC', 'Diana Castañeda', 'UASLP'], ['PB', 'Paola Beltrán', 'UV'], ['LG', 'Lucía Guerra', 'UAM']] },
+      { name: 'Equipo 02', tech: 'Robótica', members: [['FR', 'Fernanda Ríos', 'IPN'], ['MO', 'Mariana Ortiz', 'TecNM'], ['SC', 'Sofía Cordero', 'UABC']] },
+      { name: 'Equipo 03', tech: 'VR/AR', members: [['VO', 'Valeria Ocampo', 'UdeG'], ['IN', 'Itzel Navarro', 'UAEM'], ['XR', 'Ximena Rangel', 'UGto'], ['CB', 'Camila Bravo', 'UANL']] },
+      { name: 'Equipo 04', tech: 'Blockchain', members: [['KJ', 'Karla Jiménez', 'UANL'], ['RV', 'Renata Villalobos', 'BUAP'], ['AT', 'Alejandra Torres', 'UAQ']] }
+    ].map(t => ({ ...t, count: t.members.length, members: t.members.map(m => ({ ini: m[0], name: m[1], uni: m[2] })) }));
+
+    const viewLabelMap = {
+      login: 'Acceso · Iniciar sesión', signup: 'Acceso · Registro',
+      dash: 'Aplicante · Mi convocatoria', datos: 'Aplicante · Paso 1 Datos', docs: 'Aplicante · Paso 2 Documentos',
+      video: 'Aplicante · Paso 3 Videos', review: 'Aplicante · Paso 4 Revisión', result: 'Aplicante · Resultado',
+      confirm: 'Aplicante · Confirmación',
+      list: roleLabels[role] + ' · Aplicaciones', detail: role === 'admin' ? 'Admin · Evaluar aplicación' : 'ANUIES · Detalle',
+      panel: 'Admin · Panel general', teams: 'Admin · Equipos Demo Day'
+    };
+
+    return {
+      roles: [['auth', 'Acceso'], ['aplicante', 'Aplicante'], ['anuies', 'ANUIES'], ['admin', 'Admin']]
+        .map(r => ({ label: r[1], active: role === r[0], inactive: role !== r[0], onClick: () => this.setRole(r[0]) })),
+      nav: nav.map(n => ({ label: n[1], active: view === n[0], inactive: view !== n[0], onClick: this.go(n[0]) })),
+      viewLabel: viewLabelMap[view] || '',
+      roleLabel: roleLabels[role],
+      userName: users[role],
+      userInitials: initials[role],
+      isApp: role !== 'auth',
+      isAdmin: role === 'admin',
+      isAnuies: role === 'anuies',
+      isLogin: view === 'login', isSignup: view === 'signup',
+      isDash: view === 'dash', isDatos: view === 'datos', isDocs: view === 'docs', isVideo: view === 'video',
+      isReview: view === 'review', isResult: view === 'result', isConfirm: view === 'confirm',
+      isList: view === 'list', isDetail: view === 'detail', isPanel: view === 'panel', isTeams: view === 'teams',
+      openLabel: role === 'admin' ? 'Evaluar' : 'Ver',
+      goLogin: this.go('login'), goSignup: this.go('signup'), goDatos: this.go('datos'), goDocs: this.go('docs'),
+      goVideo: this.go('video'), goReview: this.go('review'), goList: this.go('list'),
+      techs: ['Inteligencia Artificial', 'Realidad Virtual / Aumentada', 'Robótica', 'Blockchain y Web3', 'Cómputo en la Nube'],
+      criterios, docs, steps, wizard, timeline, checklist, apps, kpis, adminKpis, progress, techStats, aiScores, checks, evaluadores, teams
+    };
+  }
+}
+</script>
+</body>
+</html>

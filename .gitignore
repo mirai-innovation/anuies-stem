@@ -1,0 +1,16 @@
+node_modules
+.next
+.env
+.env*.local
+.vercel
+next-env.d.ts
+*.tsbuildinfo
+.DS_Store
+
+# Herramientas locales
+.claude/
+.mongo-local/
+
+# El zip del diseño: su contenido ya está extraído en design/
+design/*.zip
+design/.thumbnail

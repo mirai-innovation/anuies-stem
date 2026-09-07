@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+/* Tokens tomados del diseno aprobado (Plataforma ANUIES4MX.dc.html).
+   Un cambio de paleta se hace aqui y no en cada vista. */
+@theme {
+  --color-fondo: #FBF5F8;
+  --color-superficie: #FFFFFF;
+  --color-tinta: #26212E;
+  --color-tinta-clara: #F3EAF0;
+  --color-gris: #736C7B;
+  --color-gris-claro: #B9AEC2;
+  --color-linea: #EEE3EA;
+  --color-linea-fuerte: #E2CDDA;
+
+  --color-rosa: #D6336C;
+  --color-rosa-oscuro: #8A1F49;
+  --color-rosa-suave: #FBE1EC;
+  --color-rosa-brillante: #FF6FA5;
+
+  --color-teal: #2F7A78;
+  --color-teal-oscuro: #1F5E5C;
+  --color-teal-suave: #DCEEEC;
+  --color-teal-borde: #C4E2DF;
+  --color-teal-brillante: #5FD6CD;
+
+  /* Las familias las inyecta next/font en <html> como --fuente-*; aqui solo
+     se les da nombre de utilidad de Tailwind y una pila de respaldo. */
+  --font-titulo: var(--fuente-titulo), "Arial Narrow", sans-serif;
+  --font-texto: var(--fuente-texto), system-ui, sans-serif;
+  --font-mono: var(--fuente-mono), ui-monospace, monospace;
+
+  /* El diseno no usa esquinas redondeadas en ningun elemento. */
+  --radius-none: 0px;
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--color-fondo);
+    color: var(--color-tinta);
+    font-family: var(--font-texto);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--color-rosa); text-decoration: none; }
+  a:hover { color: var(--color-rosa-oscuro); text-decoration: underline; text-underline-offset: 3px; }
+
+  input, select, textarea, button { font-family: inherit; }
+
+  /* Requisito de accesibilidad: foco siempre visible y con contraste. */
+  :focus-visible {
+    outline: 2px solid var(--color-rosa);
+    outline-offset: 2px;
+  }
+}

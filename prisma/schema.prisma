@@ -1,0 +1,366 @@
+// Esquema de la plataforma Reto ANUIES4MX 2026 · Mujeres en STEM
+//
+// MongoDB no tiene migraciones: el esquema se aplica con `npm run db:push`
+// y los indices se crean con `npm run db:indexes`.
+//
+// Criterio de modelado: lo que es propiedad exclusiva de una aplicacion y esta
+// acotado en numero (5 documentos, 2 videos, 1 confirmacion) va embebido.
+// Lo que el panel de administracion consulta cruzando aplicaciones
+// (evaluaciones, equipos, bitacora) vive en su propia coleccion.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------- enumeraciones
+
+enum Rol {
+  applicant
+  anuies
+  admin
+}
+
+enum EstadoAplicacion {
+  draft
+  submitted
+  in_review
+  evaluated
+  selected
+  waitlist
+  rejected
+}
+
+enum Dictamen {
+  selected
+  waitlist
+  rejected
+}
+
+enum Nivel {
+  licenciatura
+  especialidad
+  posgrado
+}
+
+enum Tecnologia {
+  ia
+  vr_ar
+  robotica
+  blockchain_web3
+  nube
+}
+
+enum AreaStem {
+  ingenieria
+  computacion
+  ciencias_exactas
+  matematicas
+  ciencias_salud
+}
+
+enum TipoDocumento {
+  constancia_inscripcion
+  relacion_estudios
+  carta_compromiso
+  carta_respaldo
+  cv
+}
+
+enum TipoVideo {
+  propuesta
+  presentacion
+}
+
+enum EstadoConfirmacion {
+  pendiente
+  confirmada
+  declinada
+}
+
+enum EstadoIA {
+  pending
+  ok
+  error
+}
+
+enum TipoToken {
+  verificacion_correo
+  recuperacion_password
+}
+
+// ---------------------------------------------------------------- tipos embebidos
+
+type DatosPersonales {
+  nombreCompleto      String?
+  curp                String?
+  fechaNacimiento     DateTime?
+  telefono            String?
+  estadoResidencia    String?
+  correoInstitucional String?
+}
+
+type Academicos {
+  universidadId       String?
+  programaEducativo   String?
+  nivel               Nivel?
+  semestre            Int?
+  promedio            Float?
+  areaStem            AreaStem?
+  // Declaracion firmada por la aplicante: no cursa el ultimo anio de su programa.
+  declaraNoUltimoAnio Boolean   @default(false)
+}
+
+type Propuesta {
+  nombre     String?
+  tecnologia Tecnologia?
+  problema   String?
+  impacto    String?
+}
+
+type Documento {
+  tipo           TipoDocumento
+  blobPathname   String
+  nombreOriginal String
+  tamanoBytes    Int
+  contentType    String
+  subidoEn       DateTime      @default(now())
+}
+
+type Video {
+  tipo             TipoVideo
+  blobPathname     String
+  nombreOriginal   String
+  tamanoBytes      Int
+  contentType      String
+  duracionSegundos Int
+  resumen          String?
+  // La llena el trabajo de transcripcion cuando TRANSCRIPCION_ACTIVA=1.
+  transcripcion    String?
+  subidoEn         DateTime  @default(now())
+}
+
+type Confirmacion {
+  estado                     EstadoConfirmacion @default(pendiente)
+  respondidoEn               DateTime?
+  ciudadOrigen               String?
+  requerimientosAlimentarios String?
+  contactoEmergencia         String?
+  tallaPlayera               String?
+  aceptaTerminos             Boolean            @default(false)
+}
+
+type Retroalimentacion {
+  fortalezas       String
+  areasOportunidad String
+}
+
+// Puntajes humanos: enteros 1..5, uno por criterio, en el orden fijo del brief.
+type Criterios {
+  claridad     Int
+  innovacion   Int
+  impacto      Int
+  viabilidad   Int
+  presentacion Int
+}
+
+// Puntaje de IA: decimal 1..5 con justificacion por criterio.
+type CriterioIA {
+  criterio      String
+  score         Float
+  justificacion String
+}
+
+type VerificacionIA {
+  label String
+  ok    Boolean
+}
+
+// ---------------------------------------------------------------- colecciones
+
+// Registro unico con las fechas de la edicion. Vive en la base y no como
+// constantes para poder probar los estados post-cierre y post-publicacion
+// sin mover el reloj del servidor, y para que "Publicar resultados" sea un
+// cambio de dato auditable en lugar de un despliegue.
+model Edicion {
+  id                     String    @id @default(auto()) @map("_id") @db.ObjectId
+  clave                  String    @unique // "2026"
+  nombre                 String
+  cierreRecepcion        DateTime
+  evaluacionInicia       DateTime
+  evaluacionTermina      DateTime
+  resultadosPublicadosEn DateTime? // null = resultados no publicados
+  confirmacionAbre       DateTime
+  confirmacionCierra     DateTime
+  eventoInicia           DateTime
+  eventoTermina          DateTime
+  promedioMinimo         Float     @default(9.0)
+  actualizadoEn          DateTime  @updatedAt
+}
+
+model Universidad {
+  id     String  @id @default(auto()) @map("_id") @db.ObjectId
+  nombre String  @unique
+  siglas String
+  estado String
+  activa Boolean @default(true)
+
+  aplicaciones Application[]
+}
+
+model User {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  nombre          String
+  email           String    @unique
+  passwordHash    String
+  rol             Rol       @default(applicant)
+  // Solo para integrantes del comite: se muestra junto a su calificacion.
+  organizacion    String?
+  emailVerifiedAt DateTime?
+  creadoEn        DateTime  @default(now())
+  actualizadoEn   DateTime  @updatedAt
+
+  aplicacion   Application? @relation("AplicacionDeUsuario")
+  evaluaciones Evaluation[]
+  tokens       Token[]
+  bitacora     AuditLog[]
+}
+
+model Token {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  tipo     TipoToken
+  hash     String    @unique // se guarda el hash, nunca el token en claro
+  userId   String    @db.ObjectId
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiraEn DateTime
+  usadoEn  DateTime?
+  creadoEn DateTime  @default(now())
+
+  @@index([userId, tipo])
+}
+
+model Application {
+  id     String           @id @default(auto()) @map("_id") @db.ObjectId
+  folio  String           @unique // A4MX-2026-NNNN
+  estado EstadoAplicacion @default(draft)
+
+  userId String @unique @db.ObjectId
+  user   User   @relation("AplicacionDeUsuario", fields: [userId], references: [id], onDelete: Cascade)
+
+  // Desnormalizado desde Academicos.universidadId para que el filtro y el
+  // conteo por universidad de la lista no exijan un lookup por fila.
+  universidadId String?      @db.ObjectId
+  universidad   Universidad? @relation(fields: [universidadId], references: [id])
+
+  datos      DatosPersonales?
+  academicos Academicos?
+  propuesta  Propuesta?
+
+  documentos Documento[]
+  videos     Video[]
+
+  confirmacion Confirmacion?
+
+  // Segunda declaracion, la que se firma al enviar (la primera, la de no
+  // cursar el ultimo anio, vive en Academicos porque se captura en el paso 1).
+  declaraVeracidad Boolean @default(false)
+
+  // Dictamen consolidado y texto que ve la aplicante. Se fijan al publicar.
+  dictamen                   Dictamen?
+  puntajeComite              Float?
+  criteriosComite            Criterios?
+  retroalimentacionPublicada Retroalimentacion?
+
+  enviadaEn     DateTime?
+  creadaEn      DateTime  @default(now())
+  actualizadaEn DateTime  @updatedAt
+  // Marca del ultimo autoguardado, para "Guardado automatico · hace X min".
+  guardadaEn    DateTime?
+
+  evaluaciones Evaluation[]
+  evaluacionIA AiEvaluation?
+  equipoId     String?       @db.ObjectId
+  equipo       Team?         @relation(fields: [equipoId], references: [id])
+
+  @@index([estado])
+  @@index([universidadId])
+  @@index([enviadaEn])
+}
+
+model Evaluation {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  applicationId String      @db.ObjectId
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  evaluatorId   String      @db.ObjectId
+  evaluator     User        @relation(fields: [evaluatorId], references: [id])
+
+  criterios Criterios
+  promedio  Float
+
+  // El diseno muestra dos bloques distintos en el resultado de la aplicante,
+  // asi que se capturan por separado en lugar de un solo comentario.
+  fortalezas       String
+  areasOportunidad String
+
+  dictamen      Dictamen
+  creadaEn      DateTime @default(now())
+  actualizadaEn DateTime @updatedAt
+
+  // Un evaluador emite a lo mas una evaluacion por aplicacion.
+  @@unique([applicationId, evaluatorId])
+  @@index([applicationId])
+}
+
+model AiEvaluation {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  applicationId String      @unique @db.ObjectId
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  estado           EstadoIA         @default(pending)
+  resumen          String?
+  criterios        CriterioIA[]
+  scoreGlobal      Float?
+  verificaciones   VerificacionIA[]
+  // Queda constancia de con que se genero.
+  modelo           String?
+  usoTranscripcion Boolean          @default(false)
+  intentos         Int              @default(0)
+  ultimoError      String?
+  generadaEn       DateTime?
+
+  @@index([estado])
+}
+
+model Team {
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  nombre     String
+  tecnologia Tecnologia
+  creadoEn   DateTime   @default(now())
+
+  integrantes Application[]
+}
+
+model AuditLog {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  accion    String // evaluacion.guardada | dictamen.cambiado | resultados.publicados | ...
+  actorId   String?  @db.ObjectId
+  actor     User?    @relation(fields: [actorId], references: [id])
+  entidad   String // "Application" | "Edicion" | ...
+  entidadId String?
+  detalle   Json?
+  creadoEn  DateTime @default(now())
+
+  @@index([entidad, entidadId])
+  @@index([creadoEn])
+}
+
+// Contador para los folios. Existe para poder usar findAndModify con $inc y
+// que dos registros simultaneos nunca reciban el mismo folio.
+model Contador {
+  id    String @id @map("_id") // "folio:2026"
+  valor Int    @default(0)
+}
