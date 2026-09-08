@@ -19,15 +19,21 @@ export function ResumenErrores({
 }) {
   const pendientes = etiquetas.filter(([clave]) => errores?.[clave]);
 
+  const primeraClave = pendientes[0]?.[0];
+
   useEffect(() => {
-    if (!pendientes.length) return;
-    const primero = document.getElementById(pendientes[0][0]);
-    primero?.scrollIntoView({ behavior: "smooth", block: "center" });
-    // El foco va después del desplazamiento para no pelearse con él.
-    const t = setTimeout(() => primero?.focus({ preventScroll: true }), 350);
-    return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [errores]);
+    if (!primeraClave) return;
+
+    // Se espera al siguiente cuadro para que el foco se aplique cuando React
+    // ya terminó de pintar el resultado de la acción. `focus()` desplaza la
+    // página hasta el campo por sí solo, así que no se combina con un
+    // `scrollIntoView` suave: hacerlo enfrentaba el desplazamiento con el
+    // re-render.
+    const cuadro = requestAnimationFrame(() => {
+      document.getElementById(primeraClave)?.focus();
+    });
+    return () => cancelAnimationFrame(cuadro);
+  }, [errores, primeraClave]);
 
   if (!pendientes.length) return null;
 
@@ -46,9 +52,7 @@ export function ResumenErrores({
                 href={`#${clave}`}
                 onClick={(e) => {
                   e.preventDefault();
-                  const el = document.getElementById(clave);
-                  el?.scrollIntoView({ behavior: "smooth", block: "center" });
-                  setTimeout(() => el?.focus({ preventScroll: true }), 350);
+                  document.getElementById(clave)?.focus();
                 }}
                 className="text-rosa-oscuro underline"
               >

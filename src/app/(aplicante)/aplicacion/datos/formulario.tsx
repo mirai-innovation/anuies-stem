@@ -113,7 +113,7 @@ export function FormularioDatos({
 
   return (
     <>
-      <form ref={form} action={accion} noValidate>
+      <form id="form-datos" ref={form} action={accion} noValidate>
         <input type="hidden" name="modo" value="validar" />
 
         {estado.error && (
@@ -333,36 +333,36 @@ export function FormularioDatos({
           </Tarjeta>
         </div>
 
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-          <Autoguardado guardadaEn={ultimoGuardado} />
-          <div className="flex flex-wrap gap-3">
-            <Boton
-              type="button"
-              variante="secundario"
-              disabled={guardandoSolo}
-              onClick={guardarEnSilencio}
-            >
-              {guardandoSolo ? "Guardando…" : "Guardar borrador"}
-            </Boton>
-            <Boton type="submit" disabled={enviando}>
-              {enviando ? "Guardando…" : "Continuar a propuesta →"}
-            </Boton>
-          </div>
-        </div>
       </form>
 
       {/* El video de presentación habla de la aplicante, no del proyecto, así
-          que acompaña a sus datos. Va fuera del formulario porque se sube por
-          su cuenta y no debe arrastrar el envío. */}
-      <div className="mt-8 grid gap-6">
-        <div>
-          <Etiqueta className="tracking-[0.14em]">
-            Video 1 de {totalVideos} · sobre ti
-          </Etiqueta>
-        </div>
+          que acompaña a sus datos.
+          Queda FUERA del <form> a propósito: se sube por su cuenta y no debe
+          viajar en el envío del formulario. Para que aun así aparezca antes de
+          los botones, la barra de acciones también sale del form y el botón de
+          continuar se ata a él con el atributo `form`. */}
+      <div className="mt-6 grid gap-6">
+        <Etiqueta className="tracking-[0.14em]">Video 1 de {totalVideos} · sobre ti</Etiqueta>
         {videos.map((v) => (
           <ZonaVideo key={v.tipo} fila={v} />
         ))}
+      </div>
+
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+        <Autoguardado guardadaEn={ultimoGuardado} />
+        <div className="flex flex-wrap gap-3">
+          <Boton
+            type="button"
+            variante="secundario"
+            disabled={guardandoSolo}
+            onClick={guardarEnSilencio}
+          >
+            {guardandoSolo ? "Guardando…" : "Guardar borrador"}
+          </Boton>
+          <Boton type="submit" form="form-datos" disabled={enviando}>
+            {enviando ? "Guardando…" : "Continuar a propuesta →"}
+          </Boton>
+        </div>
       </div>
     </>
   );

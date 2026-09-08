@@ -69,7 +69,7 @@ export function FormularioPropuesta({
 
   return (
     <>
-      <form ref={form} action={accion} noValidate>
+      <form id="form-propuesta" ref={form} action={accion} noValidate>
         <input type="hidden" name="modo" value="validar" />
 
         {estado.error && (
@@ -134,34 +134,37 @@ export function FormularioPropuesta({
           </div>
         </Tarjeta>
 
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-          <Autoguardado guardadaEn={ultimoGuardado} />
-          <div className="flex flex-wrap gap-3">
-            <BotonEnlace href="/aplicacion/datos" variante="secundario">
-              ← Volver a datos
-            </BotonEnlace>
-            <Boton
-              type="button"
-              variante="secundario"
-              disabled={guardandoSolo}
-              onClick={guardarEnSilencio}
-            >
-              {guardandoSolo ? "Guardando…" : "Guardar borrador"}
-            </Boton>
-            <Boton type="submit" disabled={enviando}>
-              {enviando ? "Guardando…" : "Continuar a documentos →"}
-            </Boton>
-          </div>
-        </div>
       </form>
 
-      <div className="mt-8 grid gap-6">
+      {/* Igual que en el paso 1: el video vive fuera del <form> pero se muestra
+          antes de los botones, y el de continuar se ata al formulario. */}
+      <div className="mt-6 grid gap-6">
         <Etiqueta className="tracking-[0.14em]">
           Video {totalVideos} de {totalVideos} · sobre tu propuesta
         </Etiqueta>
         {videos.map((v) => (
           <ZonaVideo key={v.tipo} fila={v} />
         ))}
+      </div>
+
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+        <Autoguardado guardadaEn={ultimoGuardado} />
+        <div className="flex flex-wrap gap-3">
+          <BotonEnlace href="/aplicacion/datos" variante="secundario">
+            ← Volver a datos
+          </BotonEnlace>
+          <Boton
+            type="button"
+            variante="secundario"
+            disabled={guardandoSolo}
+            onClick={guardarEnSilencio}
+          >
+            {guardandoSolo ? "Guardando…" : "Guardar borrador"}
+          </Boton>
+          <Boton type="submit" form="form-propuesta" disabled={enviando}>
+            {enviando ? "Guardando…" : "Continuar a documentos →"}
+          </Boton>
+        </div>
       </div>
     </>
   );
