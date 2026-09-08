@@ -109,8 +109,8 @@ VIDEO DE PROPUESTA
 
 /** Comprobaciones deterministas contra la base.
  *
- *  Incluyen el expediente porque la evaluación empieza al día siguiente del
- *  cierre, y para entonces los cinco documentos ya debían estar entregados. */
+ *  Incluyen los documentos: son obligatorios para enviar, así que toda
+ *  aplicación evaluable debería traer los cinco. */
 function verificaciones(app: Application, universidad: Universidad | null, promedioMinimo: number) {
   const video = app.videos.find((v) => v.tipo === "propuesta");
   const entregados = new Set(app.documentos.map((d) => d.tipo));
@@ -141,8 +141,8 @@ function verificaciones(app: Application, universidad: Universidad | null, prome
     {
       label:
         faltantes.length === 0
-          ? "Expediente completo: los cinco documentos oficiales"
-          : `Faltan documentos del expediente: ${faltantes.map((d) => d.nombre).join(", ")}`,
+          ? "Los cinco documentos oficiales están completos"
+          : `Faltan documentos: ${faltantes.map((d) => d.nombre).join(", ")}`,
       ok: faltantes.length === 0,
     },
     {

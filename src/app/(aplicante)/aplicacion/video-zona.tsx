@@ -4,13 +4,20 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import type { TipoVideo } from "@prisma/client";
-import { AreaTexto, Aviso, Barra, Boton, BotonEnlace, Chip, Etiqueta, Tarjeta } from "@/components/ui";
+import { AreaTexto, Aviso, Barra, Boton, Chip, Etiqueta, Tarjeta } from "@/components/ui";
 import { CAPTURA_VIDEO, MAX_VIDEO_BYTES } from "@/lib/constantes";
 import { duracion, pesoArchivo } from "@/lib/fechas";
-import { confirmarVideo, guardarResumenVideo } from "../subidas";
-import { useSubida } from "../subidor";
-import { Autoguardado } from "../autoguardado";
+import { confirmarVideo, guardarResumenVideo } from "./subidas";
+import { useSubida } from "./subidor";
 import { GrabadorCamara } from "./grabador";
+
+/** Bloque de captura de un video.
+ *
+ *  Lo comparten el paso de datos —donde va el de presentación— y el de
+ *  propuesta. Vive aparte porque los dos videos se capturan igual y solo
+ *  cambia dónde se montan. */
+
+export type FilaVideo = Fila;
 
 type Fila = {
   tipo: TipoVideo;
@@ -30,7 +37,7 @@ type Fila = {
 
 type Modo = "camara" | "archivo";
 
-function ZonaVideo({ fila }: { fila: Fila }) {
+export function ZonaVideo({ fila }: { fila: Fila }) {
   const router = useRouter();
   const captura = CAPTURA_VIDEO[fila.tipo];
   const puedeElegir = captura === "ambas";
@@ -286,44 +293,5 @@ function ResumenPropuesta({ inicial }: { inicial: string }) {
         </Boton>
       </div>
     </div>
-  );
-}
-
-export function ListaVideos({
-  videos,
-  guardadaEn,
-}: {
-  videos: Fila[];
-  guardadaEn: string | null;
-}) {
-  const faltan = videos.filter((v) => v.obligatorio && !v.subido);
-
-  return (
-    <>
-      <div className="grid gap-6">
-        {videos.map((v) => (
-          <ZonaVideo key={v.tipo} fila={v} />
-        ))}
-      </div>
-
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <Autoguardado guardadaEn={guardadaEn} />
-          {faltan.length > 0 && (
-            <span className="font-mono text-[10.5px] text-rosa-oscuro">
-              {faltan.length === 1
-                ? `Falta el ${faltan[0].nombre.toLowerCase()}`
-                : `Faltan ${faltan.length} videos obligatorios`}
-            </span>
-          )}
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <BotonEnlace href="/aplicacion/datos" variante="secundario">
-            ← Volver a datos
-          </BotonEnlace>
-          <BotonEnlace href="/aplicacion/revision">Revisar y enviar →</BotonEnlace>
-        </div>
-      </div>
-    </>
   );
 }

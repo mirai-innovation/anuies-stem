@@ -8,6 +8,7 @@
  */
 import { PrismaClient, type Dictamen, type EstadoAplicacion, type Nivel, type Tecnologia, type AreaStem } from "@prisma/client";
 import { hash } from "@node-rs/argon2";
+import { UNIVERSIDADES } from "./universidades";
 
 const db = new PrismaClient();
 
@@ -46,18 +47,6 @@ function curpSintetica(nombre: string, i: number) {
 }
 const hashear = (p: string) => hash(p, OPCIONES_HASH);
 
-const UNIVERSIDADES = [
-  { nombre: "Universidad Nacional Autónoma de México", siglas: "UNAM", estado: "Ciudad de México" },
-  { nombre: "Instituto Politécnico Nacional", siglas: "IPN", estado: "Ciudad de México" },
-  { nombre: "Universidad de Guadalajara", siglas: "UdeG", estado: "Jalisco" },
-  { nombre: "Tecnológico Nacional de México", siglas: "TecNM", estado: "Ciudad de México" },
-  { nombre: "Universidad Autónoma de Nuevo León", siglas: "UANL", estado: "Nuevo León" },
-  { nombre: "Benemérita Universidad Autónoma de Puebla", siglas: "BUAP", estado: "Puebla" },
-  { nombre: "Universidad Autónoma del Estado de México", siglas: "UAEMex", estado: "Estado de México" },
-  { nombre: "Universidad de Guanajuato", siglas: "UG", estado: "Guanajuato" },
-  { nombre: "Universidad Autónoma de Yucatán", siglas: "UADY", estado: "Yucatán" },
-  { nombre: "Universidad Autónoma de San Luis Potosí", siglas: "UASLP", estado: "San Luis Potosí" },
-];
 
 type Semilla = {
   folio: string;
@@ -69,7 +58,6 @@ type Semilla = {
   semestre: number;
   promedio: number;
   area: AreaStem;
-  estadoResidencia: string;
   proyecto: string;
   tecnologia: Tecnologia;
   problema: string;
@@ -100,7 +88,6 @@ const APLICANTES: Semilla[] = [
     semestre: 6,
     promedio: 9.4,
     area: "ingenieria",
-    estadoResidencia: "Ciudad de México",
     proyecto: "Sensa",
     tecnologia: "ia",
     problema:
@@ -109,7 +96,7 @@ const APLICANTES: Semilla[] = [
       "Reducir pérdidas de cosecha en unidades de producción familiar mediante diagnóstico temprano desde un teléfono, sin conexión permanente a internet.",
     estado: "evaluated",
     duracionVideo: 84,
-    docs: 3,
+    docs: 5,
     dictamen: "selected",
     fijo: {
       // Cada evaluador promedia 4.4, asi que el promedio del comite es 4.4.
@@ -132,7 +119,6 @@ const APLICANTES: Semilla[] = [
     semestre: 7,
     promedio: 9.6,
     area: "ingenieria",
-    estadoResidencia: "Ciudad de México",
     proyecto: "Aliento",
     tecnologia: "ia",
     problema:
@@ -141,7 +127,7 @@ const APLICANTES: Semilla[] = [
       "Tamizaje respiratorio de bajo costo a partir de audio de tos, para priorizar referencias en centros de salud sin radiologo.",
     estado: "evaluated",
     duracionVideo: 89,
-    docs: 4,
+    docs: 5,
     dictamen: "selected",
   },
   {
@@ -154,7 +140,6 @@ const APLICANTES: Semilla[] = [
     semestre: 8,
     promedio: 9.2,
     area: "computacion",
-    estadoResidencia: "Jalisco",
     proyecto: "Milpa Viva",
     tecnologia: "blockchain_web3",
     problema:
@@ -176,7 +161,6 @@ const APLICANTES: Semilla[] = [
     semestre: 6,
     promedio: 9.8,
     area: "ingenieria",
-    estadoResidencia: "Nuevo León",
     proyecto: "Manos",
     tecnologia: "robotica",
     problema:
@@ -198,7 +182,6 @@ const APLICANTES: Semilla[] = [
     semestre: 3,
     promedio: 9.5,
     area: "ciencias_exactas",
-    estadoResidencia: "Puebla",
     proyecto: "Sol Comun",
     tecnologia: "nube",
     problema:
@@ -214,13 +197,12 @@ const APLICANTES: Semilla[] = [
     folio: "A4MX-2026-0189",
     nombre: "Fernanda Ibarra Lozano",
     email: "fernanda.ibarra@uaemex.mx",
-    uni: "UAEMex",
+    uni: "UAEMéx",
     programa: "Ingeniería en Software",
     nivel: "licenciatura",
     semestre: 5,
     promedio: 9.1,
     area: "computacion",
-    estadoResidencia: "Estado de México",
     proyecto: "Ruta Segura",
     tecnologia: "ia",
     problema:
@@ -241,7 +223,6 @@ const APLICANTES: Semilla[] = [
     semestre: 7,
     promedio: 9.3,
     area: "ingenieria",
-    estadoResidencia: "Guanajuato",
     proyecto: "Agua Clara",
     tecnologia: "nube",
     problema:
@@ -262,7 +243,6 @@ const APLICANTES: Semilla[] = [
     semestre: 6,
     promedio: 9.7,
     area: "computacion",
-    estadoResidencia: "Yucatán",
     proyecto: "Meliponas",
     tecnologia: "ia",
     problema:
@@ -283,7 +263,6 @@ const APLICANTES: Semilla[] = [
     semestre: 5,
     promedio: 9.0,
     area: "ingenieria",
-    estadoResidencia: "San Luis Potosí",
     proyecto: "Taller Abierto",
     tecnologia: "vr_ar",
     problema:
@@ -298,13 +277,12 @@ const APLICANTES: Semilla[] = [
     folio: "A4MX-2026-0193",
     nombre: "Sofía Ledesma Quiroz",
     email: "sofia.ledesma@tecnm.mx",
-    uni: "TecNM",
+    uni: "UAdeC",
     programa: "Ingeniería en Sistemas Computacionales",
     nivel: "licenciatura",
     semestre: 6,
     promedio: 9.2,
     area: "computacion",
-    estadoResidencia: "Michoacán",
     proyecto: "Cosecha Justa",
     tecnologia: "blockchain_web3",
     problema:
@@ -325,7 +303,6 @@ const APLICANTES: Semilla[] = [
     semestre: 4,
     promedio: 9.9,
     area: "computacion",
-    estadoResidencia: "Ciudad de México",
     proyecto: "Senas",
     tecnologia: "ia",
     problema:
@@ -346,7 +323,6 @@ const APLICANTES: Semilla[] = [
     semestre: 7,
     promedio: 9.4,
     area: "ingenieria",
-    estadoResidencia: "Ciudad de México",
     proyecto: "Segunda Vida",
     tecnologia: "robotica",
     problema:
@@ -367,7 +343,6 @@ const APLICANTES: Semilla[] = [
     semestre: 2,
     promedio: 9.6,
     area: "matematicas",
-    estadoResidencia: "Jalisco",
     proyecto: "Prevenir",
     tecnologia: "nube",
     problema:
@@ -388,7 +363,6 @@ const APLICANTES: Semilla[] = [
     semestre: 4,
     promedio: 9.5,
     area: "ciencias_exactas",
-    estadoResidencia: "Nuevo León",
     proyecto: "Filtra",
     tecnologia: "nube",
     problema:
@@ -409,7 +383,6 @@ const APLICANTES: Semilla[] = [
     semestre: 5,
     promedio: 9.1,
     area: "ingenieria",
-    estadoResidencia: "Puebla",
     proyecto: "Enlace Sierra",
     tecnologia: "nube",
     problema:
@@ -424,13 +397,12 @@ const APLICANTES: Semilla[] = [
     folio: "A4MX-2026-0199",
     nombre: "Natalia Zamora Peña",
     email: "natalia.zamora@uaemex.mx",
-    uni: "UAEMex",
+    uni: "UAEMéx",
     programa: "Enfermeria",
     nivel: "licenciatura",
     semestre: 6,
     promedio: 9.3,
     area: "ciencias_salud",
-    estadoResidencia: "Estado de México",
     proyecto: "Cuidar",
     tecnologia: "vr_ar",
     problema:
@@ -451,7 +423,6 @@ const APLICANTES: Semilla[] = [
     semestre: 4,
     promedio: 9.0,
     area: "ingenieria",
-    estadoResidencia: "Guanajuato",
     proyecto: "Braille Fácil",
     tecnologia: "robotica",
     problema:
@@ -474,7 +445,6 @@ const APLICANTES: Semilla[] = [
     semestre: 5,
     promedio: 9.2,
     area: "ingenieria",
-    estadoResidencia: "Yucatán",
     proyecto: "Techo Fresco",
     tecnologia: "nube",
     problema:
@@ -494,7 +464,6 @@ const APLICANTES: Semilla[] = [
     semestre: 6,
     promedio: 9.4,
     area: "computacion",
-    estadoResidencia: "San Luis Potosí",
     proyecto: "Memoria Viva",
     tecnologia: "vr_ar",
     problema:
@@ -508,13 +477,12 @@ const APLICANTES: Semilla[] = [
     folio: "A4MX-2026-0203",
     nombre: "Gabriela Peralta Solís",
     email: "gabriela.peralta@tecnm.mx",
-    uni: "TecNM",
+    uni: "UAdeC",
     programa: "Ingeniería Industrial",
     nivel: "licenciatura",
     semestre: 7,
     promedio: 9.1,
     area: "ingenieria",
-    estadoResidencia: "Veracruz",
     proyecto: "Cadena Corta",
     tecnologia: "ia",
     problema:
@@ -657,10 +625,10 @@ async function main() {
           curp: curpSintetica(s.nombre, i),
           fechaNacimiento: new Date(Date.UTC(2003, i % 12, ((i * 7) % 27) + 1)),
           telefono: `+52 55 ${String(1000 + i * 37).padStart(4, "0")} ${String(2000 + i * 13).padStart(4, "0")}`,
-          estadoResidencia: s.estadoResidencia,
           correoInstitucional: s.email,
         },
         academicos: {
+          estadoUniversidad: UNIVERSIDADES.find((u) => u.siglas === s.uni)!.estado,
           universidad: nombreUniversidad,
           programaEducativo: s.programa,
           nivel: s.nivel,
@@ -675,17 +643,15 @@ async function main() {
           problema: s.problema,
           impacto: s.impacto,
         },
-        // Los documentos se entregan tras enviar la postulación, así que un
-        // borrador no tiene ninguno.
-        documentos: (enviada
-          ? [
-              "constancia_inscripcion",
-              "relacion_estudios",
-              "carta_compromiso",
-              "carta_respaldo",
-              "cv",
-            ]
-          : [])
+        // Los documentos son parte de la postulación, así que un borrador a
+        // medias también trae los que ya reunió.
+        documentos: ([] as string[]).concat(
+          "constancia_inscripcion",
+          "relacion_estudios",
+          "carta_compromiso",
+          "carta_respaldo",
+          "cv",
+        )
           .slice(0, s.docs)
           .map((tipo) => ({
             tipo: tipo as never,

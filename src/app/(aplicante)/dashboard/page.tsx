@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requiereRol } from "@/lib/sesion";
 import { edicionActual, recepcionAbierta, resultadosPublicados } from "@/lib/edicion";
-import { avance, documentosFaltantes, faltantesParaEnviar, pasoCompleto } from "@/lib/aplicacion";
+import { avance, faltantesParaEnviar, pasoCompleto } from "@/lib/aplicacion";
 import { CRITERIOS, PASOS, nombreDePila } from "@/lib/constantes";
 import { diasPara, fecha, fechaCorta } from "@/lib/fechas";
 import { Barra, BotonEnlace, Chip, Etiqueta, Tarjeta, Titulo } from "@/components/ui";
@@ -39,7 +39,6 @@ export default async function Dashboard() {
   }
 
   const { completos, total, fraccion } = avance(app);
-  const docsFaltantes = documentosFaltantes(app).length;
   const pendiente = PASOS.find((p) => !pasoCompleto(app, p.slug));
   const faltantes = faltantesParaEnviar(app);
 
@@ -119,28 +118,15 @@ export default async function Dashboard() {
             ) : (
               <>
                 <div className="font-titulo text-[26px] font-bold uppercase leading-tight">
-                  {resultadosPublicados(edicion)
-                    ? "Consulta tu resultado"
-                    : docsFaltantes > 0
-                      ? "Ya estás participando · faltan tus documentos"
-                      : "Ya estás participando"}
+                  {resultadosPublicados(edicion) ? "Consulta tu resultado" : "Ya estás participando"}
                 </div>
                 <p className="mb-5 mt-3 text-[13.5px] leading-relaxed text-gris-claro">
                   {resultadosPublicados(edicion)
                     ? "El comité publicó los dictámenes. Revisa tu puntaje y la retroalimentación."
-                    : docsFaltantes > 0
-                      ? `Tu postulación quedó registrada con tus videos. Para completarla, sube tus ${docsFaltantes === 1 ? "documento pendiente" : `${docsFaltantes} documentos pendientes`} antes del ${fechaCorta(edicion.cierreRecepcion)}.`
-                      : `Tu postulación y tus documentos están completos. La evaluación corre del ${fechaCorta(edicion.evaluacionInicia)} al ${fechaCorta(edicion.evaluacionTermina)}.`}
+                    : `Tu postulación quedó registrada y completa. La evaluación corre del ${fechaCorta(edicion.evaluacionInicia)} al ${fechaCorta(edicion.evaluacionTermina)}.`}
                 </p>
-                <BotonEnlace
-                  href={resultadosPublicados(edicion) ? "/resultado" : docsFaltantes > 0 ? "/expediente" : "/resultado"}
-                  variante="brillante"
-                >
-                  {resultadosPublicados(edicion)
-                    ? "Ver mi resultado →"
-                    : docsFaltantes > 0
-                      ? "Subir mis documentos →"
-                      : "Ver mi resultado →"}
+                <BotonEnlace href="/resultado" variante="brillante">
+                  Ver mi resultado →
                 </BotonEnlace>
               </>
             )}
@@ -166,46 +152,27 @@ export default async function Dashboard() {
                 {[
                   {
                     n: "01",
-                    titulo:
-                      docsFaltantes === 0
-                        ? "Documentos entregados"
-                        : "Sube tus documentos oficiales",
-                    texto:
-                      docsFaltantes === 0
-                        ? "Tus cinco documentos están completos. Puedes reemplazarlos hasta el cierre."
-                        : `Te ${docsFaltantes === 1 ? "falta 1 documento" : `faltan ${docsFaltantes} documentos`}. Súbelos antes del ${fechaCorta(edicion.cierreRecepcion)}, cuando cierra la convocatoria: el comité los necesita para verificar tu elegibilidad.`,
-                    destacado: docsFaltantes > 0,
-                  },
-                  {
-                    n: "02",
                     titulo: "Evaluación del comité",
                     texto: `Del ${fechaCorta(edicion.evaluacionInicia)} al ${fechaCorta(edicion.evaluacionTermina)}. No tienes que hacer nada durante este periodo.`,
                   },
                   {
-                    n: "03",
+                    n: "02",
                     titulo: "Publicación de resultados",
                     texto: `El ${fechaCorta(edicion.resultadosPublicadosEn ?? edicion.resultadosPrevistos)} podrás ver tu dictamen, tu puntaje por criterio y la retroalimentación del comité.`,
                   },
                   {
-                    n: "04",
+                    n: "03",
                     titulo: "Si resultas seleccionada",
                     texto: `Confirmas tu participación del ${fechaCorta(edicion.confirmacionAbre)} al ${fechaCorta(edicion.confirmacionCierra)}, y en diciembre nos vemos en Valle de Bravo.`,
                   },
                 ].map((p) => (
                   <li key={p.n} className="grid grid-cols-[26px_1fr] gap-3">
-                    <span
-                      className={`font-mono text-[12px] ${p.destacado ? "font-semibold text-rosa" : "text-teal-oscuro"}`}
-                    >
+                    <span className="font-mono text-[12px] text-teal-oscuro">
                       {p.n}
                     </span>
                     <div>
                       <div className="text-[13.5px] font-semibold text-tinta">{p.titulo}</div>
                       <p className="mt-1 text-[12.5px] leading-relaxed text-tinta/85">{p.texto}</p>
-                      {p.n === "01" && (
-                        <BotonEnlace href="/expediente" variante="secundario" className="mt-3">
-                          {docsFaltantes === 0 ? "Ver mis documentos" : "Subir mis documentos"}
-                        </BotonEnlace>
-                      )}
                     </div>
                   </li>
                 ))}

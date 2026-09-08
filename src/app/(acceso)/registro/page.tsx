@@ -8,15 +8,14 @@ import { FormularioRegistro } from "./formulario";
 
 export const metadata = { title: "Registro de aplicante · Reto ANUIES4MX 2026" };
 
-/** Lo que de verdad se necesita para postular. Los cinco documentos oficiales
- *  ya no van aquí: son del expediente, que solo integran las seleccionadas
- *  después de los resultados. Listarlos en el registro haría creer que hay que
- *  reunirlos antes de empezar. */
+/** Lo que hay que reunir para postular. Se muestra desde el registro porque
+ *  varios documentos los emite la universidad y tardan: enterarse al llegar al
+ *  paso 3 sería tarde. */
 const TEN_A_LA_MANO = [
   "El nombre de tu universidad y de tu programa educativo.",
   "Tu promedio global acumulado: el mínimo es 9.0.",
   "Tu propuesta descrita en dos textos breves: el problema y el impacto esperado.",
-  "Un video de propuesta de hasta 90 segundos, en MP4 o MOV.",
+  "Constancia de inscripción, relación de estudios, carta compromiso, carta de respaldo y CV.",
 ];
 
 export default async function Registro() {
@@ -44,8 +43,8 @@ export default async function Registro() {
             ))}
           </ol>
           <p className="mt-4 text-[12.5px] leading-relaxed text-tinta">
-            El video de presentación se graba aquí mismo con tu cámara, y los documentos
-            oficiales solo se piden si resultas seleccionada.
+            Y dos videos: uno sobre ti y otro sobre tu propuesta. Puedes grabarlos en la
+            plataforma con tu cámara o subir el archivo.
           </p>
           <div className="mt-5 border-t border-teal-borde pt-4 font-mono text-[10px] uppercase tracking-[0.12em] text-teal-oscuro">
             Cierre de recepción

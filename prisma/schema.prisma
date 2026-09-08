@@ -100,11 +100,13 @@ type DatosPersonales {
   curp                String?
   fechaNacimiento     DateTime?
   telefono            String?
-  estadoResidencia    String?
   correoInstitucional String?
 }
 
 type Academicos {
+  // Estado donde está la universidad. Acota las sugerencias del catálogo:
+  // buscar entre las de un estado es manejable, entre las de todo el país no.
+  estadoUniversidad   String?
   // Lo que la aplicante escribió, tal cual. Es texto libre: el catálogo ANUIES
   // no cubre todos los nombres con que una institución se autodenomina, y
   // obligar a elegir de una lista dejaba fuera casos legítimos.

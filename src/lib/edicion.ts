@@ -30,12 +30,3 @@ export function confirmacionAbierta(e: Edicion, ahora = new Date()) {
   return ahora >= e.confirmacionAbre && ahora <= e.confirmacionCierra;
 }
 
-/** Ventana de integración del expediente.
- *
- *  Se habilita al enviar la postulación y cierra con la convocatoria: quien
- *  mandó su video ya está participando, y los documentos oficiales tienen que
- *  estar completos antes del cierre, porque la evaluación empieza al día
- *  siguiente y el comité los necesita para verificar la elegibilidad. */
-export function expedienteAbierto(e: Edicion, ahora = new Date()) {
-  return ahora <= e.cierreRecepcion;
-}

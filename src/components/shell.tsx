@@ -13,7 +13,6 @@ export const NAVEGACION: Record<Rol, { href: string; label: string }[]> = {
     { href: "/aplicacion/datos", label: "Mi aplicación" },
     { href: "/resultado", label: "Resultado" },
     { href: "/confirmacion", label: "Confirmación" },
-    { href: "/expediente", label: "Expediente" },
   ],
   anuies: [{ href: "/aplicaciones", label: "Aplicaciones" }],
   admin: [

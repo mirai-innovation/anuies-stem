@@ -102,13 +102,8 @@ export const DICTAMENES: Record<Dictamen, string> = {
   rejected: "No seleccionada",
 };
 
-/** Documentos del expediente.
- *
- *  Ya no se piden para postular: se integran DESPUÉS de la publicación de
- *  resultados y solo las aplicantes seleccionadas los entregan. Pedir cinco
- *  constancias oficiales por adelantado a cientos de estudiantes, cuando la
- *  mayoría no será seleccionada, es trabajo desperdiciado para ellas y para
- *  las áreas escolares que los emiten. */
+/** Los cinco documentos oficiales. Son obligatorios para poder enviar la
+ *  postulación y se capturan en el paso 3. */
 export const DOCUMENTOS: { tipo: TipoDocumento; nombre: string; ayuda: string }[] = [
   {
     tipo: "constancia_inscripcion",
@@ -165,7 +160,7 @@ export const VIDEOS: {
     tipo: "propuesta",
     nombre: "Video de propuesta",
     ayuda:
-      "Presenta tu propuesta de negocio. Debe cubrir los componentes que pide la convocatoria, porque es con este video con el que se califica tu idea.",
+      "Presenta tu propuesta. Debe cubrir los componentes que pide la convocatoria, porque es con este video con el que se califica tu idea.",
     puntos: [
       "El problema u oportunidad que detectaste, y a quién afecta.",
       "La solución que propones.",
@@ -180,13 +175,12 @@ export const VIDEOS: {
 
 /** Cómo se captura cada video.
  *
- *  La presentación se graba en el momento: es espontánea por diseño y pedir un
- *  archivo la volvería un trámite. La propuesta admite las dos vías, porque
- *  hay quien quiere editarla con apoyos visuales y quien prefiere resolverla
- *  frente a la cámara; obligar a una sola forma penalizaría a alguien sin
- *  relación con la calidad de su idea. */
+ *  Los dos admiten grabar con la cámara o subir un archivo. La grabación en
+ *  vivo es cómoda, pero depende de permisos del navegador y de que el equipo
+ *  tenga cámara: dejar siempre abierta la vía del archivo evita que un
+ *  problema técnico impida postular. */
 export const CAPTURA_VIDEO: Record<TipoVideo, "camara" | "ambas"> = {
-  presentacion: "camara",
+  presentacion: "ambas",
   propuesta: "ambas",
 };
 
@@ -218,9 +212,18 @@ export const TALLAS = ["XS", "S", "M", "L", "XL", "2XL"];
 
 export const PASOS = [
   { num: "Paso 1", slug: "datos", label: "Datos personales y académicos" },
-  { num: "Paso 2", slug: "videos", label: "Videos" },
-  { num: "Paso 3", slug: "revision", label: "Revisión y envío" },
+  { num: "Paso 2", slug: "propuesta", label: "Propuesta" },
+  { num: "Paso 3", slug: "documentos", label: "Documentos" },
+  { num: "Paso 4", slug: "revision", label: "Revisión y envío" },
 ] as const;
+
+/** En qué paso se captura cada video. La presentación acompaña a los datos
+ *  personales —habla de la aplicante, no del proyecto— y la de propuesta va
+ *  con la propuesta escrita. */
+export const PASO_DE_VIDEO: Record<TipoVideo, "datos" | "propuesta"> = {
+  presentacion: "datos",
+  propuesta: "propuesta",
+};
 
 /** Saludo del tablero. Los nombres mexicanos suelen traer dos nombres de pila
  *  y dos apellidos, asi que con cuatro o mas partes se saluda con las dos

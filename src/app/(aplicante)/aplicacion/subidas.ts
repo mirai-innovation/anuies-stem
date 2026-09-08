@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import type { TipoDocumento, TipoVideo } from "@prisma/client";
 import { db } from "@/lib/db";
 import { exigeRol } from "@/lib/sesion";
-import { edicionActual, expedienteAbierto, recepcionAbierta } from "@/lib/edicion";
+import { edicionActual, recepcionAbierta } from "@/lib/edicion";
 import {
   DOCUMENTOS,
   MAX_GRABACION_BYTES,
@@ -36,22 +36,6 @@ async function borradorEditable() {
   return { usuario, app };
 }
 
-/** Guarda del expediente. Es otra ventana que la del borrador: se abre cuando
- *  la postulación ya se envió y se cierra con la convocatoria. */
-async function expedienteEditable() {
-  const usuario = await exigeRol("applicant");
-  const edicion = await edicionActual();
-
-  const app = await db.application.findUnique({ where: { userId: usuario.id } });
-  if (!app) throw new Error("No existe una aplicación para esta cuenta.");
-  if (app.estado === "draft") {
-    throw new Error("El expediente se habilita cuando envías tu postulación.");
-  }
-  if (!expedienteAbierto(edicion)) {
-    throw new Error("La entrega de documentos cerró junto con la convocatoria.");
-  }
-  return { usuario, app };
-}
 
 export type Autorizacion = {
   url?: string;
@@ -106,9 +90,7 @@ export async function autorizarSubida(datos: {
     }
 
     const esDocumento = datos.clase === "documento";
-    // Cada clase tiene su propia ventana: los videos son parte de la
-    // postulación y los documentos, del expediente posterior.
-    const { app } = esDocumento ? await expedienteEditable() : await borradorEditable();
+    const { app } = await borradorEditable();
     const { tipos, maximo, minimo, error } = reglas(datos.clase);
 
     // El navegador añade el códec al tipo, por ejemplo "video/webm;codecs=vp9".
@@ -145,7 +127,7 @@ export async function confirmarDocumento(
   nombreOriginal: string,
 ): Promise<ResultadoSubida> {
   try {
-    const { app } = await expedienteEditable();
+    const { app } = await borradorEditable();
     if (!DOCUMENTOS.some((d) => d.tipo === tipo)) return { error: "Tipo de documento desconocido." };
 
     const meta = await metadatos(key);
@@ -179,7 +161,7 @@ export async function confirmarDocumento(
       data: { documentos, guardadaEn: new Date() },
     });
 
-    revalidatePath("/expediente");
+    revalidatePath("/aplicacion", "layout");
     revalidatePath("/dashboard");
     return { ok: true };
   } catch (e) {

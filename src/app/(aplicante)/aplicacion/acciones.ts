@@ -12,6 +12,8 @@ import { reconocerUniversidad } from "@/lib/universidades";
 export type EstadoGuardado = {
   ok?: boolean;
   guardadaEn?: string;
+  /** Errores por campo. La clave es el `id` del control, para que el
+   *  formulario pueda además llevar el foco al primero que falta. */
   errores?: Record<string, string>;
   error?: string;
 };
@@ -37,15 +39,18 @@ async function borradorEditable() {
 const texto = (max: number) => z.string().trim().max(max);
 
 /** CURP: 18 caracteres con la estructura oficial. */
-const CURP = /^[A-Z][AEIOUX][A-Z]{2}\d{6}[HM](?:AS|BC|BS|CC|CL|CM|CS|CH|DF|DG|GT|GR|HG|JC|MC|MN|MS|NT|NL|OC|PL|QT|QR|SP|SL|SR|TC|TS|TL|VZ|YN|ZS|NE)[B-DF-HJ-NP-TV-Z]{3}[0-9A-Z]\d$/;
+const CURP =
+  /^[A-Z][AEIOUX][A-Z]{2}\d{6}[HM](?:AS|BC|BS|CC|CL|CM|CS|CH|DF|DG|GT|GR|HG|JC|MC|MN|MS|NT|NL|OC|PL|QT|QR|SP|SL|SR|TC|TS|TL|VZ|YN|ZS|NE)[B-DF-HJ-NP-TV-Z]{3}[0-9A-Z]\d$/;
+
+// ------------------------------------------------------------------ paso 1
 
 const EsquemaDatos = z.object({
   nombreCompleto: texto(120),
   curp: z.string().trim().toUpperCase(),
   fechaNacimiento: z.string().trim(),
   telefono: texto(30),
-  estadoResidencia: texto(60),
   correoInstitucional: z.string().trim().toLowerCase(),
+  estadoUniversidad: texto(60),
   universidad: texto(160),
   programaEducativo: texto(120),
   nivel: z.enum(["licenciatura", "especialidad", "posgrado"]).or(z.literal("")),
@@ -55,13 +60,8 @@ const EsquemaDatos = z.object({
     .enum(["ingenieria", "computacion", "ciencias_exactas", "matematicas", "ciencias_salud"])
     .or(z.literal("")),
   declaraNoUltimoAnio: z.string().optional(),
-  nombrePropuesta: texto(120),
-  problema: texto(800),
-  impacto: texto(800),
 });
 
-/** Reglas de elegibilidad y de forma. Se aplican solo cuando la aplicante
- *  pide continuar; el autoguardado nunca bloquea por campos incompletos. */
 function validarDatos(d: z.infer<typeof EsquemaDatos>, promedioMinimo: number) {
   const e: Record<string, string> = {};
 
@@ -71,13 +71,13 @@ function validarDatos(d: z.infer<typeof EsquemaDatos>, promedioMinimo: number) {
 
   if (!d.fechaNacimiento) e.fechaNacimiento = "Indica tu fecha de nacimiento.";
   if (!d.telefono) e.telefono = "Escribe un teléfono de contacto.";
-  if (!d.estadoResidencia) e.estadoResidencia = "Selecciona tu estado de residencia.";
 
   if (!d.correoInstitucional) e.correoInstitucional = "Escribe tu correo institucional.";
   else if (!z.string().email().safeParse(d.correoInstitucional).success) {
     e.correoInstitucional = "El correo no es válido.";
   }
 
+  if (!d.estadoUniversidad) e.estadoUniversidad = "Selecciona el estado de tu universidad.";
   if (!d.universidad) e.universidad = "Escribe el nombre de tu universidad.";
   if (!d.programaEducativo) e.programaEducativo = "Escribe tu programa educativo.";
   if (!d.nivel) e.nivel = "Selecciona el nivel de estudios.";
@@ -102,10 +102,6 @@ function validarDatos(d: z.infer<typeof EsquemaDatos>, promedioMinimo: number) {
     e.declaraNoUltimoAnio =
       "Debes declarar que no cursas el último año de tu programa: la convocatoria no admite a quienes lo cursan.";
   }
-
-  if (!d.nombrePropuesta) e.nombrePropuesta = "Escribe el nombre de tu propuesta.";
-  if (!d.problema) e.problema = "Describe el problema u oportunidad.";
-  if (!d.impacto) e.impacto = "Describe el impacto social esperado.";
 
   return e;
 }
@@ -135,12 +131,11 @@ export async function guardarDatos(
     if (Object.keys(errores).length > 0) return { errores };
   }
 
-  const guardadaEn = new Date();
-
   // Se guarda el nombre tal como lo escribió y, aparte, la coincidencia con el
-  // catálogo ANUIES. Cuando no hay coincidencia la postulación sigue su curso:
-  // el catálogo sirve para filtrar y para avisar, no para rechazar.
+  // catálogo ANUIES. Sin coincidencia la postulación sigue su curso: el
+  // catálogo sirve para filtrar y para avisar, no para rechazar.
   const universidadId = await reconocerUniversidad(d.universidad);
+  const guardadaEn = new Date();
 
   await db.application.update({
     where: { id: app.id },
@@ -151,10 +146,10 @@ export async function guardarDatos(
         curp: d.curp || null,
         fechaNacimiento: d.fechaNacimiento ? new Date(`${d.fechaNacimiento}T12:00:00Z`) : null,
         telefono: d.telefono || null,
-        estadoResidencia: d.estadoResidencia || null,
         correoInstitucional: d.correoInstitucional || null,
       },
       academicos: {
+        estadoUniversidad: d.estadoUniversidad || null,
         universidad: d.universidad || null,
         programaEducativo: d.programaEducativo || null,
         nivel: d.nivel || null,
@@ -163,11 +158,60 @@ export async function guardarDatos(
         areaStem: d.areaStem || null,
         declaraNoUltimoAnio: Boolean(d.declaraNoUltimoAnio),
       },
+      guardadaEn,
+    },
+  });
+
+  revalidatePath("/aplicacion", "layout");
+  revalidatePath("/dashboard");
+
+  return { ok: true, guardadaEn: guardadaEn.toISOString() };
+}
+
+// ------------------------------------------------------------------ paso 2
+
+const EsquemaPropuesta = z.object({
+  nombrePropuesta: texto(120),
+  problema: texto(800),
+  impacto: texto(800),
+});
+
+export async function guardarPropuesta(
+  _previo: EstadoGuardado,
+  datos: FormData,
+): Promise<EstadoGuardado> {
+  let contexto;
+  try {
+    contexto = await borradorEditable();
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "No se pudo guardar." };
+  }
+
+  const { app } = contexto;
+  const modo = String(datos.get("modo") ?? "parcial");
+
+  const parseo = EsquemaPropuesta.safeParse(Object.fromEntries(datos));
+  if (!parseo.success) {
+    return { error: "Hay campos con un formato que el servidor no reconoce." };
+  }
+  const d = parseo.data;
+
+  if (modo === "validar") {
+    const errores: Record<string, string> = {};
+    if (!d.nombrePropuesta) errores.nombrePropuesta = "Escribe el nombre de tu propuesta.";
+    if (!d.problema) errores.problema = "Describe el problema u oportunidad que resuelve.";
+    if (!d.impacto) errores.impacto = "Describe el impacto social esperado.";
+    if (Object.keys(errores).length > 0) return { errores };
+  }
+
+  const guardadaEn = new Date();
+  await db.application.update({
+    where: { id: app.id },
+    data: {
       propuesta: {
         nombre: d.nombrePropuesta || null,
-        // La tecnología ya no se le pregunta a la aplicante: la clasifica la
-        // evaluación por IA a partir de la propuesta escrita. Se conserva lo
-        // que hubiera para no perderlo al guardar.
+        // La tecnología no se le pregunta a la aplicante: la clasifica la
+        // evaluación por IA a partir de la propuesta escrita.
         tecnologia: app.propuesta?.tecnologia ?? null,
         problema: d.problema || null,
         impacto: d.impacto || null,
@@ -181,6 +225,8 @@ export async function guardarDatos(
 
   return { ok: true, guardadaEn: guardadaEn.toISOString() };
 }
+
+// ------------------------------------------------------------------ envío
 
 /** Envío definitivo. Vuelve a comprobar todo contra la base: el checklist que
  *  ve la aplicante es informativo, esta función es la que decide. */
@@ -204,9 +250,7 @@ export async function enviarAplicacion(
   const conDeclaracion = { ...app, declaraVeracidad: true };
 
   if (!puedeEnviar(conDeclaracion)) {
-    return {
-      error: `Todavía falta: ${faltantesParaEnviar(conDeclaracion).join(" ")}`,
-    };
+    return { error: `Todavía falta: ${faltantesParaEnviar(conDeclaracion).join(" ")}` };
   }
 
   const enviadaEn = new Date();

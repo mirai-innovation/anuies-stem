@@ -1,5 +1,4 @@
 import type { Application, Edicion } from "@prisma/client";
-import { DOCUMENTOS } from "@/lib/constantes";
 import { fechaCorta } from "@/lib/fechas";
 
 type Hito = { fecha: string; etapa: string; nota: string; hecho: boolean };
@@ -9,7 +8,6 @@ type Hito = { fecha: string; etapa: string; nota: string; hecho: boolean };
 function hitos(app: Application, edicion: Edicion, publicados: boolean): Hito[] {
   const enviada = app.estado !== "draft";
   const ahora = new Date();
-  const entregados = app.documentos.length;
 
   return [
     {
@@ -25,18 +23,6 @@ function hitos(app: Application, edicion: Edicion, publicados: boolean): Hito[] 
         ? "Ya no puede editarse."
         : "Tienes hasta el cierre de recepción para enviarla.",
       hecho: enviada,
-    },
-    {
-      // Va justo después del envío porque vence con la convocatoria, no al
-      // final: el comité necesita los documentos para evaluar.
-      fecha: `Hasta ${fechaCorta(edicion.cierreRecepcion)}`,
-      etapa: "Entrega de documentos",
-      nota: !enviada
-        ? "Se habilita cuando envías tu postulación."
-        : entregados === DOCUMENTOS.length
-          ? "Tus cinco documentos están entregados."
-          : `Llevas ${entregados} de ${DOCUMENTOS.length}. Súbelos antes del cierre.`,
-      hecho: enviada && entregados === DOCUMENTOS.length,
     },
     {
       fecha: `${fechaCorta(edicion.evaluacionInicia)} — ${fechaCorta(edicion.evaluacionTermina)}`,

@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { TipoDocumento } from "@prisma/client";
-import { Aviso, Barra, Chip, Tarjeta } from "@/components/ui";
+import { Aviso, Barra, BotonEnlace, Chip, Tarjeta } from "@/components/ui";
+import { Autoguardado } from "../autoguardado";
 import { MAX_PDF_BYTES } from "@/lib/constantes";
 import { pesoArchivo } from "@/lib/fechas";
-import { confirmarDocumento } from "../aplicacion/subidas";
-import { useSubida } from "../aplicacion/subidor";
+import { confirmarDocumento } from "../subidas";
+import { useSubida } from "../subidor";
 
 type Fila = {
   tipo: TipoDocumento;
@@ -16,7 +17,7 @@ type Fila = {
   subido: { nombreOriginal: string; tamanoBytes: number; subidoEn: string } | null;
 };
 
-function FilaDocumento({ fila, soloLectura }: { fila: Fila; soloLectura?: boolean }) {
+function FilaDocumento({ fila }: { fila: Fila }) {
   const router = useRouter();
   const { estado, input, manejar, limpiarError } = useSubida(
     "documento",
@@ -53,8 +54,7 @@ function FilaDocumento({ fila, soloLectura }: { fila: Fila; soloLectura?: boolea
               Ver PDF
             </Link>
           )}
-          {!soloLectura && (
-            <>
+          <>
               <label
                 htmlFor={idInput}
                 className={`inline-flex cursor-pointer items-center border border-linea-fuerte px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.08em] hover:border-rosa hover:text-rosa ${
@@ -75,8 +75,7 @@ function FilaDocumento({ fila, soloLectura }: { fila: Fila; soloLectura?: boolea
                   if (a) void manejar(a);
                 }}
               />
-            </>
-          )}
+          </>
         </div>
       </div>
 
@@ -107,12 +106,10 @@ function FilaDocumento({ fila, soloLectura }: { fila: Fila; soloLectura?: boolea
 
 export function ListaDocumentos({
   documentos,
-  cierre,
-  soloLectura,
+  guardadaEn,
 }: {
   documentos: Fila[];
-  cierre: string;
-  soloLectura?: boolean;
+  guardadaEn: string | null;
 }) {
   const faltan = documentos.filter((d) => !d.subido).length;
   const entregados = documentos.length - faltan;
@@ -122,7 +119,7 @@ export function ListaDocumentos({
       <Tarjeta className="mb-6">
         <div className="mb-3.5 flex flex-wrap items-baseline justify-between gap-3">
           <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-gris">
-            Avance del expediente
+            Avance de documentos
           </div>
           <div className="font-mono text-[13px] font-semibold text-rosa">
             {entregados} de {documentos.length} documentos
@@ -130,11 +127,9 @@ export function ListaDocumentos({
         </div>
         <Barra valor={entregados / documentos.length} tono={faltan === 0 ? "teal" : "rosa"} />
         <p className="mt-4 text-[13px] leading-relaxed text-gris">
-          {soloLectura
-            ? "La entrega está cerrada."
-            : faltan === 0
-              ? `Tu expediente está completo. Puedes reemplazar cualquier documento hasta el ${cierre}.`
-              : `Te ${faltan === 1 ? "falta 1 documento" : `faltan ${faltan} documentos`}. Tienes hasta el ${cierre}.`}
+          {faltan === 0
+            ? "Están los cinco. Puedes reemplazar cualquiera antes de enviar."
+            : `Te ${faltan === 1 ? "falta 1 documento" : `faltan ${faltan} documentos`} para poder enviar tu postulación.`}
         </p>
       </Tarjeta>
 
@@ -148,9 +143,26 @@ export function ListaDocumentos({
           </div>
         </div>
         {documentos.map((d) => (
-          <FilaDocumento key={d.tipo} fila={d} soloLectura={soloLectura} />
+          <FilaDocumento key={d.tipo} fila={d} />
         ))}
       </Tarjeta>
+
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <Autoguardado guardadaEn={guardadaEn} />
+          {faltan > 0 && (
+            <span className="font-mono text-[10.5px] text-rosa-oscuro">
+              {faltan === 1 ? "Falta 1 documento" : `Faltan ${faltan} documentos`}
+            </span>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <BotonEnlace href="/aplicacion/propuesta" variante="secundario">
+            ← Volver a propuesta
+          </BotonEnlace>
+          <BotonEnlace href="/aplicacion/revision">Revisar y enviar →</BotonEnlace>
+        </div>
+      </div>
     </>
   );
 }

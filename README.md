@@ -92,12 +92,12 @@ El navegador sube directo a S3, así que el bucket necesita permitir `POST` desd
 | `/login` | — | Acceso; el rol de la cuenta define a dónde entra |
 | `/registro` | — | Alta de aplicante con verificación de correo |
 | `/dashboard` | aplicante | Avance, cronología, siguiente acción |
-| `/aplicacion/datos` | aplicante | Paso 1, con autoguardado |
-| `/aplicacion/videos` | aplicante | Paso 2, propuesta subida y presentación grabada |
-| `/aplicacion/revision` | aplicante | Paso 3, checklist y envío |
+| `/aplicacion/datos` | aplicante | Paso 1: identificación, trayectoria y video de presentación |
+| `/aplicacion/propuesta` | aplicante | Paso 2: propuesta escrita y video de propuesta |
+| `/aplicacion/documentos` | aplicante | Paso 3: los cinco PDF obligatorios |
+| `/aplicacion/revision` | aplicante | Paso 4: checklist y envío |
 | `/resultado` | aplicante | Dictamen, puntaje por criterio, retroalimentación |
 | `/confirmacion` | aplicante | Confirmar o declinar el lugar |
-| `/expediente` | aplicante | Documentos oficiales; se habilita al enviar y cierra con la convocatoria |
 | `/aplicaciones` | ANUIES | Lista con filtros, paginación y CSV |
 | `/aplicaciones/:id` | ANUIES | Detalle completo, sin IA ni captura |
 | `/admin` | admin | KPIs, avance, ejecutar IA, publicar resultados |
@@ -108,20 +108,20 @@ El navegador sube directo a S3, así que el bucket necesita permitir `POST` desd
 
 ## Cómo se postula
 
-La postulación son **tres pasos**: datos, videos y envío. No se piden documentos para postular.
+Cuatro pasos: datos, propuesta, documentos y envío. Los cinco documentos oficiales son obligatorios para enviar, y por eso se anuncian desde el registro: algunos los emite la universidad y tardan.
 
-Los **cinco documentos oficiales se entregan después de enviar**, en `/expediente`, con fecha límite el cierre de la convocatoria. Enviar los videos ya deja a la aplicante participando; los documentos son el respaldo que el comité necesita para verificar la elegibilidad, y la evaluación arranca al día siguiente del cierre.
+Los dos videos son obligatorios y evalúan cosas distintas, así que van en pasos distintos:
 
-El orden importa y la interfaz lo dice con todas sus letras: al enviar, el tablero encabeza con «Ya estás participando» y, si faltan documentos, con cuántos y hasta cuándo. Antes de enviar, `/expediente` no está vacío: muestra la lista para que se vayan reuniendo, porque algunos los emite la universidad y tardan.
+- **Presentación** (hasta 60 s, en el paso 1): quién es, qué estudia y por qué quiere participar. **No es sobre la propuesta**: aquí se evalúa la motivación. Acompaña a los datos personales porque habla de ella, no del proyecto.
+- **Propuesta** (hasta 90 s, en el paso 2): la idea, con los componentes que pide la convocatoria.
 
-Los dos videos son obligatorios y evalúan cosas distintas, así que se piden en este orden:
+Los dos admiten **grabar con la cámara o subir un archivo**. La grabación en vivo es cómoda, pero depende de permisos del navegador y de que el equipo tenga cámara: dejar siempre abierta la vía del archivo evita que un problema técnico impida postular.
 
-1. **Presentación** (hasta 60 s): quién es, qué estudia y por qué quiere participar. **No es sobre la propuesta**: aquí se evalúa la motivación. Se graba en el momento con la cámara; va primero porque es el más fácil de hacer y rompe el hielo antes del que sí se califica a fondo.
-2. **Propuesta** (hasta 90 s): la idea de negocio, con los componentes que pide la convocatoria. Admite las dos vías —grabar con la cámara o subir un archivo— porque hay quien quiere editarlo con apoyos visuales y quien prefiere resolverlo frente a la cámara; obligar a una sola forma penalizaría a alguien por algo que no tiene que ver con la calidad de su idea.
+**La universidad se captura en dos campos.** Primero el estado, que acota las sugerencias; luego el nombre, como texto libre con el catálogo de esa entidad como sugerencia. Son 145 instituciones en todo el país: sin acotar por estado, la lista no ayuda. El catálogo vive en `prisma/universidades.ts` y sale del directorio de IES afiliadas a CUPIA que publica la ANUIES.
 
-Cada video muestra en pantalla, punto por punto, qué debe incluir. Una sola línea de ayuda no alcanza para explicarlo, y de eso depende que el video sirva para evaluar.
+**La tecnología emergente no se le pregunta a la aplicante.** La clasifica la evaluación por IA a partir de la propuesta escrita, entre las cinco de la convocatoria. De ese dato dependen el filtro de la lista, el conteo del panel y la sugerencia de equipos del Demo Day.
 
-**La tecnología emergente no se le pregunta a la aplicante.** La clasifica la evaluación por IA a partir de la propuesta escrita, entre las cinco de la convocatoria. Se hace así porque de ese dato dependen el filtro de la lista, el conteo del panel y la sugerencia de equipos del Demo Day: quitarlo del formulario sin más habría dejado esas tres cosas vacías.
+**Cuando falta un dato, se dice cuál.** Al intentar avanzar, el formulario encabeza con la lista de campos pendientes —nombrados, con su motivo y enlazados— y lleva el foco al primero. Marcar en rojo y nada más obliga a recorrer el formulario buscando qué falta, y en pantallas largas el campo con error puede quedar fuera de vista.
 
 ## Decisiones que conviene conocer
 
