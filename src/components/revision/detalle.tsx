@@ -12,7 +12,7 @@ import {
   TECNOLOGIAS,
 } from "@/lib/constantes";
 import { duracion, fechaCorta, pesoArchivo } from "@/lib/fechas";
-import { Chip, Etiqueta, Tarjeta, Titulo } from "@/components/ui";
+import { Aviso, Chip, Etiqueta, Tarjeta, Titulo } from "@/components/ui";
 import { PanelIA } from "./panel-ia";
 import { FormularioEvaluacion } from "./formulario-evaluacion";
 
@@ -61,7 +61,7 @@ export async function DetalleAplicacion({
       : null;
 
   const ficha = [
-    app.universidad?.siglas,
+    app.academicos?.universidad ?? app.universidad?.nombre,
     app.academicos?.programaEducativo,
     app.academicos?.semestre ? `${app.academicos.semestre}º semestre` : null,
     app.academicos?.promedio != null ? `Promedio ${app.academicos.promedio.toFixed(1)}` : null,
@@ -78,6 +78,15 @@ export async function DetalleAplicacion({
       >
         ← Todas las aplicaciones
       </Link>
+
+      {!app.universidadId && app.academicos?.universidad && (
+        <div className="mb-4 max-w-[70ch]">
+          <Aviso tono="info">
+            La institución que escribió la aplicante no coincide con ninguna del catálogo ANUIES.
+            No es motivo de rechazo, pero conviene verificarla contra la constancia.
+          </Aviso>
+        </div>
+      )}
 
       <div className="mb-6 flex flex-wrap items-end justify-between gap-5">
         <div>

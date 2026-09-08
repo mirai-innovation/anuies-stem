@@ -641,6 +641,8 @@ async function main() {
 
     const enviada = s.estado !== "draft";
     const universidadId = universidades.get(s.uni)!;
+    // Se siembra el nombre completo, que es lo que una aplicante escribiría.
+    const nombreUniversidad = UNIVERSIDADES.find((u) => u.siglas === s.uni)!.nombre;
 
     const app = await db.application.create({
       data: {
@@ -657,7 +659,7 @@ async function main() {
           correoInstitucional: s.email,
         },
         academicos: {
-          universidadId,
+          universidad: nombreUniversidad,
           programaEducativo: s.programa,
           nivel: s.nivel,
           semestre: s.semestre,

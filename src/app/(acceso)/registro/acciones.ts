@@ -12,7 +12,6 @@ const Esquema = z
   .object({
     nombre: z.string().trim().min(3, "Escribe tu nombre completo.").max(120),
     email: z.string().trim().toLowerCase().email("Escribe un correo válido."),
-    universidadId: z.string().trim().min(1, "Selecciona tu universidad."),
     password: z
       .string()
       .min(10, "La contraseña debe tener al menos 10 caracteres.")
@@ -62,11 +61,6 @@ export async function crearCuenta(
 
   const d = parseo.data;
 
-  const universidad = await db.universidad.findUnique({ where: { id: d.universidadId } });
-  if (!universidad || !universidad.activa) {
-    return { errores: { universidadId: "Esa institución no está en el catálogo ANUIES." } };
-  }
-
   const existente = await db.user.findUnique({ where: { email: d.email } });
   if (existente) {
     // No se confirma ni se niega la existencia de la cuenta más allá de lo que
@@ -89,15 +83,18 @@ export async function crearCuenta(
 
   // El borrador se crea junto con la cuenta para que el folio exista desde el
   // principio: el diseño lo muestra como "folio provisional" antes del envío.
+  //
+  // La institución no se pide aquí. Se captura en el paso 1, como texto libre,
+  // porque el registro debe ser lo más corto posible: cada campo de más en
+  // esta pantalla es gente que abandona antes de tener cuenta.
   const folio = await siguienteFolio();
   await db.application.create({
     data: {
       folio,
       userId: user.id,
       estado: "draft",
-      universidadId: universidad.id,
       datos: { nombreCompleto: d.nombre, correoInstitucional: d.email },
-      academicos: { universidadId: universidad.id, declaraNoUltimoAnio: true },
+      academicos: { declaraNoUltimoAnio: true },
     },
   });
 

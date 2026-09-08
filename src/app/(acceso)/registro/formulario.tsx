@@ -2,16 +2,12 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import { Aviso, Boton, Campo, Entrada, Etiqueta, Seleccion, Tarjeta } from "@/components/ui";
+import { Aviso, Boton, Campo, Entrada, Etiqueta, Tarjeta } from "@/components/ui";
 import { crearCuenta, type EstadoRegistro } from "./acciones";
 
 const VACIO: EstadoRegistro = {};
 
-export function FormularioRegistro({
-  universidades,
-}: {
-  universidades: { id: string; nombre: string }[];
-}) {
+export function FormularioRegistro() {
   const [estado, accion, enviando] = useActionState(crearCuenta, VACIO);
   const err = estado.errores ?? {};
 
@@ -64,26 +60,6 @@ export function FormularioRegistro({
             placeholder="nombre@universidad.mx"
             aria-invalid={Boolean(err.email)}
           />
-        </Campo>
-
-        <Campo
-          id="universidadId"
-          etiqueta="Universidad asociada a ANUIES"
-          error={err.universidadId}
-        >
-          <Seleccion
-            id="universidadId"
-            name="universidadId"
-            defaultValue=""
-            aria-invalid={Boolean(err.universidadId)}
-          >
-            <option value="">Selecciona tu institución…</option>
-            {universidades.map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.nombre}
-              </option>
-            ))}
-          </Seleccion>
         </Campo>
 
         <div className="grid gap-4 sm:grid-cols-2">

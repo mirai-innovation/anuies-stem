@@ -1,5 +1,4 @@
 import { requiereRol } from "@/lib/sesion";
-import { db } from "@/lib/db";
 import { edicionActual } from "@/lib/edicion";
 import { checklist, puedeEnviar } from "@/lib/aplicacion";
 import { TECNOLOGIAS, etiquetaPaso } from "@/lib/constantes";
@@ -16,12 +15,6 @@ export default async function PasoRevision() {
   const app = await aplicacionOFalla(usuario.id);
   const edicion = await edicionActual();
 
-  const universidad = app.academicos?.universidadId
-    ? await db.universidad.findUnique({
-        where: { id: app.academicos.universidadId },
-        select: { siglas: true, nombre: true },
-      })
-    : null;
 
   const items = checklist(app, edicion.promedioMinimo);
   // La declaración de veracidad se firma en esta pantalla, así que para saber
@@ -77,7 +70,7 @@ export default async function PasoRevision() {
                   "Tecnología",
                   app.propuesta?.tecnologia ? TECNOLOGIAS[app.propuesta.tecnologia] : "—",
                 ],
-                ["Universidad", universidad?.siglas ?? "—"],
+                ["Universidad", app.academicos?.universidad ?? "—"],
                 [
                   "Promedio",
                   app.academicos?.promedio != null ? app.academicos.promedio.toFixed(1) : "—",

@@ -114,8 +114,17 @@ export async function ListaAplicaciones({
                       <td className="whitespace-nowrap px-4 py-3 font-medium">
                         {a.datos?.nombreCompleto ?? "—"}
                       </td>
-                      <td className="whitespace-nowrap px-4 py-3 text-gris">
-                        {a.universidad?.siglas ?? "—"}
+                      <td className="px-4 py-3 text-gris">
+                        {a.universidad?.siglas ?? (
+                          // Sin coincidencia con el catálogo: se muestra lo que
+                          // escribió, señalado para que salte a la vista.
+                          <span
+                            title={a.academicos?.universidad ?? undefined}
+                            className="block max-w-[180px] truncate text-rosa-oscuro"
+                          >
+                            {a.academicos?.universidad ?? "—"}
+                          </span>
+                        )}
                       </td>
                       <td className="whitespace-nowrap px-4 py-3 text-gris">
                         {a.propuesta?.tecnologia ? TECNOLOGIAS[a.propuesta.tecnologia] : "—"}

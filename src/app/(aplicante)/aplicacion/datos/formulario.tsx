@@ -28,7 +28,7 @@ type Inicial = {
   telefono: string;
   estadoResidencia: string;
   correoInstitucional: string;
-  universidadId: string;
+  universidad: string;
   programaEducativo: string;
   nivel: string;
   semestre: string;
@@ -48,12 +48,15 @@ const INTERVALO_MS = 30_000;
 
 export function FormularioDatos({
   inicial,
-  universidades,
+  sugerencias,
   promedioMinimo,
   guardadaEn,
 }: {
   inicial: Inicial;
-  universidades: { id: string; nombre: string }[];
+  /** Nombres del catálogo ANUIES. Son sugerencias, no opciones: el campo
+   *  admite cualquier texto. Sirven para que la misma institución no acabe
+   *  escrita de quince formas distintas. */
+  sugerencias: string[];
   promedioMinimo: number;
   guardadaEn: string | null;
 }) {
@@ -206,20 +209,26 @@ export function FormularioDatos({
         <Tarjeta>
           <Etiqueta className="mb-5 text-rosa">Trayectoria académica</Etiqueta>
           <div className="grid gap-4">
-            <Campo id="universidadId" etiqueta="Universidad ANUIES" error={err.universidadId}>
-              <Seleccion
-                id="universidadId"
-                name="universidadId"
-                defaultValue={inicial.universidadId}
-                aria-invalid={Boolean(err.universidadId)}
-              >
-                <option value="">Selecciona tu institución…</option>
-                {universidades.map((u) => (
-                  <option key={u.id} value={u.id}>
-                    {u.nombre}
-                  </option>
+            <Campo
+              id="universidad"
+              etiqueta="Universidad"
+              ayuda="Escribe el nombre completo de tu institución"
+              error={err.universidad}
+            >
+              <Entrada
+                id="universidad"
+                name="universidad"
+                list="catalogo-universidades"
+                autoComplete="off"
+                defaultValue={inicial.universidad}
+                placeholder="Universidad Nacional Autónoma de México"
+                aria-invalid={Boolean(err.universidad)}
+              />
+              <datalist id="catalogo-universidades">
+                {sugerencias.map((n) => (
+                  <option key={n} value={n} />
                 ))}
-              </Seleccion>
+              </datalist>
             </Campo>
 
             <div className="grid gap-4 sm:grid-cols-2">

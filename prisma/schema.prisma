@@ -105,13 +105,16 @@ type DatosPersonales {
 }
 
 type Academicos {
-  universidadId       String?
+  // Lo que la aplicante escribió, tal cual. Es texto libre: el catálogo ANUIES
+  // no cubre todos los nombres con que una institución se autodenomina, y
+  // obligar a elegir de una lista dejaba fuera casos legítimos.
+  universidad         String?
   programaEducativo   String?
   nivel               Nivel?
   semestre            Int?
   promedio            Float?
   areaStem            AreaStem?
-  // Declaracion firmada por la aplicante: no cursa el ultimo anio de su programa.
+  // Declaración firmada por la aplicante: no cursa el último año de su programa.
   declaraNoUltimoAnio Boolean   @default(false)
 }
 
@@ -251,8 +254,10 @@ model Application {
   userId String @unique @db.ObjectId
   user   User   @relation("AplicacionDeUsuario", fields: [userId], references: [id], onDelete: Cascade)
 
-  // Desnormalizado desde Academicos.universidadId para que el filtro y el
-  // conteo por universidad de la lista no exijan un lookup por fila.
+  // Coincidencia automática de lo que escribió contra el catálogo ANUIES.
+  // Queda en null cuando no se reconoce el nombre, y eso es información útil:
+  // son las que alguien tiene que revisar a mano. Sirve además para filtrar y
+  // contar por institución sin hacer un lookup por fila.
   universidadId String?      @db.ObjectId
   universidad   Universidad? @relation(fields: [universidadId], references: [id])
 

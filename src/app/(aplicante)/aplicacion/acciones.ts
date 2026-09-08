@@ -7,6 +7,7 @@ import { exigeRol } from "@/lib/sesion";
 import { edicionActual, recepcionAbierta } from "@/lib/edicion";
 import { puedeEnviar, faltantesParaEnviar } from "@/lib/aplicacion";
 import { registrar } from "@/lib/bitacora";
+import { reconocerUniversidad } from "@/lib/universidades";
 
 export type EstadoGuardado = {
   ok?: boolean;
@@ -45,7 +46,7 @@ const EsquemaDatos = z.object({
   telefono: texto(30),
   estadoResidencia: texto(60),
   correoInstitucional: z.string().trim().toLowerCase(),
-  universidadId: z.string().trim(),
+  universidad: texto(160),
   programaEducativo: texto(120),
   nivel: z.enum(["licenciatura", "especialidad", "posgrado"]).or(z.literal("")),
   semestre: z.string().trim(),
@@ -78,7 +79,7 @@ function validarDatos(d: z.infer<typeof EsquemaDatos>, promedioMinimo: number) {
     e.correoInstitucional = "El correo no es válido.";
   }
 
-  if (!d.universidadId) e.universidadId = "Selecciona tu universidad.";
+  if (!d.universidad) e.universidad = "Escribe el nombre de tu universidad.";
   if (!d.programaEducativo) e.programaEducativo = "Escribe tu programa educativo.";
   if (!d.nivel) e.nivel = "Selecciona el nivel de estudios.";
 
@@ -138,10 +139,15 @@ export async function guardarDatos(
 
   const guardadaEn = new Date();
 
+  // Se guarda el nombre tal como lo escribió y, aparte, la coincidencia con el
+  // catálogo ANUIES. Cuando no hay coincidencia la postulación sigue su curso:
+  // el catálogo sirve para filtrar y para avisar, no para rechazar.
+  const universidadId = await reconocerUniversidad(d.universidad);
+
   await db.application.update({
     where: { id: app.id },
     data: {
-      universidadId: d.universidadId || null,
+      universidadId,
       datos: {
         nombreCompleto: d.nombreCompleto || null,
         curp: d.curp || null,
@@ -151,7 +157,7 @@ export async function guardarDatos(
         correoInstitucional: d.correoInstitucional || null,
       },
       academicos: {
-        universidadId: d.universidadId || null,
+        universidad: d.universidad || null,
         programaEducativo: d.programaEducativo || null,
         nivel: d.nivel || null,
         semestre: d.semestre ? Number(d.semestre) : null,

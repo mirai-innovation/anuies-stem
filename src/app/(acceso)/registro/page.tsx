@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { db } from "@/lib/db";
 import { sesionActual } from "@/lib/sesion";
 import { edicionActual } from "@/lib/edicion";
 import { fechaCorta } from "@/lib/fechas";
@@ -9,24 +8,21 @@ import { FormularioRegistro } from "./formulario";
 
 export const metadata = { title: "Registro de aplicante · Reto ANUIES4MX 2026" };
 
+/** Lo que de verdad se necesita para postular. Los cinco documentos oficiales
+ *  ya no van aquí: son del expediente, que solo integran las seleccionadas
+ *  después de los resultados. Listarlos en el registro haría creer que hay que
+ *  reunirlos antes de empezar. */
 const TEN_A_LA_MANO = [
-  "Constancia de inscripción emitida por tu universidad ANUIES.",
-  "Relación de estudios oficial con promedio global mínimo de 9.0.",
-  "Carta compromiso con ANUIES (formato oficial).",
-  "Carta de respaldo de tu institución.",
-  "Currículum vitae actualizado.",
-  "Video de propuesta de hasta 90 segundos.",
+  "El nombre de tu universidad y de tu programa educativo.",
+  "Tu promedio global acumulado: el mínimo es 9.0.",
+  "Tu propuesta descrita en dos textos breves: el problema y el impacto esperado.",
+  "Un video de propuesta de hasta 90 segundos, en MP4 o MOV.",
 ];
 
 export default async function Registro() {
   if (await sesionActual()) redirect("/");
 
   const edicion = await edicionActual();
-  const universidades = await db.universidad.findMany({
-    where: { activa: true },
-    orderBy: { nombre: "asc" },
-    select: { id: true, nombre: true },
-  });
 
   return (
     <main className="mx-auto max-w-[1080px] px-7 pb-16 pt-11">
@@ -38,7 +34,7 @@ export default async function Registro() {
       </p>
 
       <div className="grid items-start gap-6 lg:grid-cols-[1.3fr_1fr]">
-        <FormularioRegistro universidades={universidades} />
+        <FormularioRegistro />
 
         <Tarjeta tono="teal">
           <Etiqueta className="mb-4 text-teal-oscuro">Ten a la mano</Etiqueta>
@@ -47,6 +43,10 @@ export default async function Registro() {
               <li key={t}>{t}</li>
             ))}
           </ol>
+          <p className="mt-4 text-[12.5px] leading-relaxed text-tinta">
+            El video de presentación se graba aquí mismo con tu cámara, y los documentos
+            oficiales solo se piden si resultas seleccionada.
+          </p>
           <div className="mt-5 border-t border-teal-borde pt-4 font-mono text-[10px] uppercase tracking-[0.12em] text-teal-oscuro">
             Cierre de recepción
             <br />

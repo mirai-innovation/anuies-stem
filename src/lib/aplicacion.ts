@@ -19,7 +19,7 @@ export function datosCompletos(app: Application) {
       d.telefono &&
       d.estadoResidencia &&
       d.correoInstitucional &&
-      a?.universidadId &&
+      a?.universidad &&
       a.programaEducativo &&
       a.nivel &&
       a.semestre &&

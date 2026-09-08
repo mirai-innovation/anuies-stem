@@ -115,7 +115,11 @@ function verificaciones(app: Application, universidad: Universidad | null, prome
       ok: (app.academicos?.promedio ?? 0) >= promedioMinimo,
     },
     {
-      label: "Institución en el catálogo ANUIES",
+      // El catálogo dejó de ser un candado en la captura, así que aquí sirve
+      // para señalar a quién hay que verificar a mano.
+      label: universidad
+        ? `Institución reconocida en el catálogo ANUIES: ${universidad.siglas}`
+        : `"${app.academicos?.universidad ?? "sin capturar"}" no coincide con el catálogo ANUIES: verificar contra la constancia`,
       ok: Boolean(universidad?.activa),
     },
     {

@@ -14,10 +14,13 @@ export default async function PasoDatos() {
   const app = await aplicacionOFalla(usuario.id);
   const edicion = await edicionActual();
 
+  // El catálogo ya no restringe la captura: se manda solo como sugerencias
+  // para reducir la cantidad de formas distintas de escribir la misma
+  // institución.
   const universidades = await db.universidad.findMany({
     where: { activa: true },
     orderBy: { nombre: "asc" },
-    select: { id: true, nombre: true },
+    select: { nombre: true },
   });
 
   return (
@@ -26,7 +29,7 @@ export default async function PasoDatos() {
       <Titulo className="mb-6 mt-1.5 text-[40px]">Datos personales y académicos</Titulo>
       <NavPasos />
       <FormularioDatos
-        universidades={universidades}
+        sugerencias={universidades.map((u) => u.nombre)}
         promedioMinimo={edicion.promedioMinimo}
         guardadaEn={app.guardadaEn ? app.guardadaEn.toISOString() : null}
         inicial={{
@@ -38,7 +41,7 @@ export default async function PasoDatos() {
           telefono: app.datos?.telefono ?? "",
           estadoResidencia: app.datos?.estadoResidencia ?? "",
           correoInstitucional: app.datos?.correoInstitucional ?? usuario.email,
-          universidadId: app.academicos?.universidadId ?? "",
+          universidad: app.academicos?.universidad ?? "",
           programaEducativo: app.academicos?.programaEducativo ?? "",
           nivel: app.academicos?.nivel ?? "",
           semestre: app.academicos?.semestre ? String(app.academicos.semestre) : "",
