@@ -193,7 +193,6 @@ model Edicion {
   id                     String    @id @default(auto()) @map("_id") @db.ObjectId
   clave                  String    @unique // "2026"
   nombre                 String
-  lanzamiento            DateTime
   cierreRecepcion        DateTime
   evaluacionInicia       DateTime
   evaluacionTermina      DateTime

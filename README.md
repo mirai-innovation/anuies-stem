@@ -89,7 +89,6 @@ El navegador sube directo a S3, así que el bucket necesita permitir `POST` desd
 
 | Ruta | Rol | Qué hace |
 |---|---|---|
-| `/` | público | Convocatoria completa; desde aquí se entra a registro o a iniciar sesión |
 | `/login` | — | Acceso; el rol de la cuenta define a dónde entra |
 | `/registro` | — | Alta de aplicante con verificación de correo |
 | `/dashboard` | aplicante | Avance, cronología, siguiente acción |
@@ -106,14 +105,6 @@ El navegador sube directo a S3, así que el bucket necesita permitir `POST` desd
 | `/admin/aplicaciones/:id` | admin | Detalle, panel de IA y captura de evaluación |
 | `/admin/equipos` | admin | Equipos del Demo Day |
 | `/admin/usuarios` | admin | Cuentas y roles |
-
-## La portada
-
-La raíz es la convocatoria pública, adaptada del documento original al sistema visual de la plataforma. Quien ya tiene sesión no la ve: se le manda a su panel.
-
-Las fechas del cronograma **no están escritas en la página**: salen de la colección `Edicion`, así que mover el cierre desde la administración también mueve lo que lee quien entra por primera vez. Por eso `Edicion` distingue `resultadosPrevistos` —la fecha anunciada en la convocatoria— de `resultadosPublicadosEn`, el momento en que el administrador publicó de verdad. Sin esa separación, la portada anunciaría la fecha en que terminó la evaluación en lugar de la prometida.
-
-La sección de requisitos se reordenó respecto del documento original, que listaba los cinco documentos oficiales junto con todo lo demás. Aquí aparecen aparte, bajo "si resultas seleccionada", porque es cuando se piden.
 
 ## Cómo se postula
 
