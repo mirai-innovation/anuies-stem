@@ -500,7 +500,70 @@ const COMITE = [
   { nombre: "Mtra. Susana Peralta Vidal", email: "susana.peralta@anuies4mx.test", organizacion: "ANUIES · Vinculación" },
 ];
 
+/** Dominio de las cuentas que este script crea. Todo lo que no termine así
+ *  lo registró una persona de verdad. */
+const DOMINIO_SEED = "@anuies4mx.test";
+
+/** Freno de mano.
+ *
+ *  El seed arranca borrando todas las colecciones, y esta base la comparten
+ *  desarrollo y producción. Sin esta comprobación, una corrida distraída
+ *  destruye postulaciones reales: ya pasó en esta convocatoria y no se
+ *  recuperaron.
+ *
+ *  Si aparece una sola cuenta ajena al seed, el script se detiene. Para
+ *  borrarla de todas formas hay que pedirlo a propósito con SEED_FORZAR=1,
+ *  que es justo el gesto deliberado que faltaba. */
+async function verificarQueNoHayaCuentasReales() {
+  const ajenas = await db.user.findMany({
+    where: { NOT: { email: { endsWith: DOMINIO_SEED } } },
+    select: { email: true, creadoEn: true },
+    orderBy: { creadoEn: "asc" },
+  });
+
+  if (ajenas.length === 0) return;
+
+  if (process.env.SEED_FORZAR === "1") {
+    console.warn(
+      `\n⚠  SEED_FORZAR=1: se borrarán ${ajenas.length} ${ajenas.length === 1 ? "cuenta real" : "cuentas reales"} junto con sus postulaciones.\n`,
+    );
+    return;
+  }
+
+  console.error(
+    [
+      "",
+      "═".repeat(72),
+      "  SEED DETENIDO: hay cuentas que este script no creó.",
+      "═".repeat(72),
+      "",
+      `  El seed borra TODAS las colecciones antes de sembrar, y encontró`,
+      `  ${ajenas.length} ${ajenas.length === 1 ? "cuenta" : "cuentas"} fuera del dominio ${DOMINIO_SEED}:`,
+      "",
+      ...ajenas
+        .slice(0, 10)
+        .map((u) => `    · ${u.email}  (registrada el ${u.creadoEn.toISOString().slice(0, 10)})`),
+      ...(ajenas.length > 10 ? [`    · … y ${ajenas.length - 10} más`] : []),
+      "",
+      "  Correrlo ahora las eliminaría junto con sus postulaciones, sus",
+      "  videos y sus documentos, sin vuelta atrás.",
+      "",
+      "  Si estás en desarrollo, apunta DATABASE_URL a una base propia:",
+      "    …mongodb.net/anuies-stem-dev?retryWrites=true&w=majority",
+      "",
+      "  Si de verdad quieres borrarlas, pídelo a propósito:",
+      "    SEED_FORZAR=1 npm run db:seed",
+      "",
+      "═".repeat(72),
+      "",
+    ].join("\n"),
+  );
+  process.exit(1);
+}
+
 async function main() {
+  await verificarQueNoHayaCuentasReales();
+
   console.log("Limpiando colecciones…");
   await db.auditLog.deleteMany();
   await db.aiEvaluation.deleteMany();

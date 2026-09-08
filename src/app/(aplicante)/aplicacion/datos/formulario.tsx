@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useMemo, useRef, useState } from "react";
-import { AREAS_STEM, NIVELES } from "@/lib/constantes";
+import { NIVELES } from "@/lib/constantes";
 import { Aviso, Boton, Campo, Entrada, Etiqueta, Seleccion, Tarjeta } from "@/components/ui";
 import { ResumenErrores } from "@/components/errores";
 import { guardarDatos, type EstadoGuardado } from "../acciones";
@@ -21,7 +21,6 @@ type Inicial = {
   nivel: string;
   semestre: string;
   promedio: string;
-  areaStem: string;
   declaraNoUltimoAnio: boolean;
 };
 
@@ -43,7 +42,6 @@ const ETIQUETAS: [string, string][] = [
   ["nivel", "Nivel"],
   ["semestre", "Semestre actual"],
   ["promedio", "Promedio global acumulado"],
-  ["areaStem", "Área STEM"],
   ["declaraNoUltimoAnio", "Declaración de no cursar el último año"],
 ];
 
@@ -278,7 +276,7 @@ export function FormularioDatos({
                 </Campo>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <Campo id="semestre" etiqueta="Semestre actual" error={err.semestre}>
                   <Entrada
                     id="semestre"
@@ -308,21 +306,6 @@ export function FormularioDatos({
                     placeholder="9.4"
                     aria-invalid={Boolean(err.promedio)}
                   />
-                </Campo>
-                <Campo id="areaStem" etiqueta="Área STEM" error={err.areaStem}>
-                  <Seleccion
-                    id="areaStem"
-                    name="areaStem"
-                    defaultValue={inicial.areaStem}
-                    aria-invalid={Boolean(err.areaStem)}
-                  >
-                    <option value="">Selecciona…</option>
-                    {Object.entries(AREAS_STEM).map(([v, l]) => (
-                      <option key={v} value={v}>
-                        {l}
-                      </option>
-                    ))}
-                  </Seleccion>
                 </Campo>
               </div>
 

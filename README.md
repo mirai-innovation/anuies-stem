@@ -119,7 +119,7 @@ Los dos admiten **grabar con la cámara o subir un archivo**. La grabación en v
 
 **La universidad se captura en dos campos.** Primero el estado, que acota las sugerencias; luego el nombre, como texto libre con el catálogo de esa entidad como sugerencia. Son 145 instituciones en todo el país: sin acotar por estado, la lista no ayuda. El catálogo vive en `prisma/universidades.ts` y sale del directorio de IES afiliadas a CUPIA que publica la ANUIES.
 
-**La tecnología emergente no se le pregunta a la aplicante.** La clasifica la evaluación por IA a partir de la propuesta escrita, entre las cinco de la convocatoria. De ese dato dependen el filtro de la lista, el conteo del panel y la sugerencia de equipos del Demo Day.
+**Ni la tecnología emergente ni el área STEM se le preguntan a la aplicante.** Las clasifica la evaluación por IA: la tecnología a partir de la propuesta escrita y el área a partir del programa educativo. De la tecnología dependen el filtro de la lista, el conteo del panel y la sugerencia de equipos del Demo Day, así que quitarla del formulario sin más habría dejado esas tres cosas vacías.
 
 **Cuando falta un dato, se dice cuál.** Al intentar avanzar, el formulario encabeza con la lista de campos pendientes —nombrados, con su motivo y enlazados— y lleva el foco al primero. Marcar en rojo y nada más obliga a recorrer el formulario buscando qué falta, y en pantallas largas el campo con error puede quedar fuera de vista.
 
@@ -179,6 +179,18 @@ npm run db:push    # aplica el esquema
 npm run db:seed    # datos de prueba (borra y vuelve a sembrar)
 npm run db:local   # MongoDB efímero para desarrollo sin Atlas
 ```
+
+## El seed no borra cuentas reales
+
+`db:seed` empieza vaciando todas las colecciones, y esta base la comparten desarrollo y producción. Para que una corrida distraída no destruya postulaciones —ya pasó una vez y no se recuperaron—, el script se detiene si encuentra cualquier cuenta fuera del dominio `@anuies4mx.test`, que es el que usan sus propios usuarios de prueba. Enumera las que encontró y no toca nada.
+
+Para borrarlas de todas formas hay que pedirlo a propósito:
+
+```bash
+SEED_FORZAR=1 npm run db:seed
+```
+
+La solución de fondo, de todos modos, es separar las bases: apunta tu `DATABASE_URL` local a `anuies-stem-dev` y deja `anuies-stem` para Vercel.
 
 ## Pendientes conocidos
 

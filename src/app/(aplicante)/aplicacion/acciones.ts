@@ -56,9 +56,6 @@ const EsquemaDatos = z.object({
   nivel: z.enum(["licenciatura", "especialidad", "posgrado"]).or(z.literal("")),
   semestre: z.string().trim(),
   promedio: z.string().trim(),
-  areaStem: z
-    .enum(["ingenieria", "computacion", "ciencias_exactas", "matematicas", "ciencias_salud"])
-    .or(z.literal("")),
   declaraNoUltimoAnio: z.string().optional(),
 });
 
@@ -97,7 +94,6 @@ function validarDatos(d: z.infer<typeof EsquemaDatos>, promedioMinimo: number) {
     e.promedio = `La convocatoria pide un promedio mínimo de ${promedioMinimo.toFixed(1)}.`;
   }
 
-  if (!d.areaStem) e.areaStem = "Selecciona tu área STEM.";
   if (!d.declaraNoUltimoAnio) {
     e.declaraNoUltimoAnio =
       "Debes declarar que no cursas el último año de tu programa: la convocatoria no admite a quienes lo cursan.";
@@ -155,7 +151,9 @@ export async function guardarDatos(
         nivel: d.nivel || null,
         semestre: d.semestre ? Number(d.semestre) : null,
         promedio: d.promedio ? Number(d.promedio) : null,
-        areaStem: d.areaStem || null,
+        // El área STEM ya no se le pregunta: la clasifica la evaluación por
+        // IA a partir del programa educativo. Se conserva lo que hubiera.
+        areaStem: app.academicos?.areaStem ?? null,
         declaraNoUltimoAnio: Boolean(d.declaraNoUltimoAnio),
       },
       guardadaEn,

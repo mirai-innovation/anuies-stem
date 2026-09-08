@@ -74,7 +74,6 @@ export default async function PasoDatos() {
           nivel: app.academicos?.nivel ?? "",
           semestre: app.academicos?.semestre ? String(app.academicos.semestre) : "",
           promedio: app.academicos?.promedio != null ? String(app.academicos.promedio) : "",
-          areaStem: app.academicos?.areaStem ?? "",
           declaraNoUltimoAnio: app.academicos?.declaraNoUltimoAnio ?? false,
         }}
       />

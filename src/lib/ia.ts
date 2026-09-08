@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import type { Application, Tecnologia, Universidad } from "@prisma/client";
+import type { Application, AreaStem, Tecnologia, Universidad } from "@prisma/client";
 import { db } from "./db";
 import { AREAS_STEM, CRITERIOS, DOCUMENTOS, NIVELES, TECNOLOGIAS, VIDEOS } from "./constantes";
 
@@ -30,8 +30,14 @@ export function iaConfigurada() {
 const ESQUEMA = {
   type: "object",
   additionalProperties: false,
-  required: ["resumen", "criterios", "scoreGlobal", "tecnologia"],
+  required: ["resumen", "criterios", "scoreGlobal", "tecnologia", "areaStem"],
   properties: {
+    areaStem: {
+      type: "string",
+      enum: ["ingenieria", "computacion", "ciencias_exactas", "matematicas", "ciencias_salud"],
+      description:
+        "Área STEM del programa educativo que cursa la aplicante: ingenieria, computacion, ciencias_exactas, matematicas o ciencias_salud.",
+    },
     tecnologia: {
       type: "string",
       enum: ["ia", "vr_ar", "robotica", "blockchain_web3", "nube"],
@@ -75,7 +81,7 @@ Reglas:
 - Si un dato no está en la información recibida, dilo explícitamente en la justificación en lugar de suponerlo.
 - El criterio "Presentación del video" solo puede juzgarse con la transcripción. Si no la recibes, asigna 3 y declara en la justificación que no había transcripción disponible.
 - El scoreGlobal es el promedio de los cinco puntajes, con un decimal.
-- Además, clasifica la propuesta en una de las cinco tecnologías emergentes de la convocatoria. Esta clasificación se usa para armar los equipos del Demo Day, así que elige la que realmente domina la solución.
+- Además, clasifica dos cosas: la tecnología emergente que domina la propuesta —de ella dependen los equipos del Demo Day, así que elige la que realmente predomina— y el área STEM del programa educativo que cursa la aplicante.
 - Tu evaluación es un insumo informativo: nunca sustituye al comité humano.`;
 
 function prompt(app: Application, universidad: Universidad | null, transcripcion: string | null) {
@@ -89,7 +95,6 @@ DATOS ACADÉMICOS
 - Nivel: ${app.academicos?.nivel ? NIVELES[app.academicos.nivel] : "no declarado"}
 - Semestre: ${app.academicos?.semestre ?? "no declarado"}
 - Promedio global acumulado: ${app.academicos?.promedio ?? "no declarado"}
-- Área STEM: ${app.academicos?.areaStem ? AREAS_STEM[app.academicos.areaStem] : "no declarada"}
 
 PROPUESTA
 - Nombre: ${app.propuesta?.nombre ?? "sin nombre"}
@@ -203,6 +208,7 @@ export async function evaluarConIA(applicationId: string): Promise<ResultadoIA> 
         criterios: { criterio: string; score: number; justificacion: string }[];
         scoreGlobal: number;
         tecnologia: Tecnologia;
+        areaStem: AreaStem;
       };
 
       // Se reordenan según el orden fijo del brief; el modelo podría
@@ -249,15 +255,20 @@ export async function evaluarConIA(applicationId: string): Promise<ResultadoIA> 
         },
       });
 
-      // La tecnología ya no se le pregunta a la aplicante, así que la deja
-      // fijada esta clasificación. De ella dependen el filtro de la lista, el
-      // conteo del panel y la sugerencia de equipos del Demo Day.
-      if (TECNOLOGIAS[datos.tecnologia]) {
-        await db.application.update({
-          where: { id: applicationId },
-          data: { propuesta: { ...app.propuesta, tecnologia: datos.tecnologia } },
-        });
-      }
+      // Ni la tecnología ni el área STEM se le preguntan a la aplicante: las
+      // deja fijadas esta clasificación. De la tecnología dependen el filtro
+      // de la lista, el conteo del panel y los equipos del Demo Day.
+      await db.application.update({
+        where: { id: applicationId },
+        data: {
+          ...(TECNOLOGIAS[datos.tecnologia]
+            ? { propuesta: { ...app.propuesta, tecnologia: datos.tecnologia } }
+            : {}),
+          ...(AREAS_STEM[datos.areaStem] && app.academicos
+            ? { academicos: { ...app.academicos, areaStem: datos.areaStem } }
+            : {}),
+        },
+      });
 
       return { ok: true };
     } catch (e) {

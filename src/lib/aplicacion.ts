@@ -21,7 +21,6 @@ export const CAMPOS_DATOS: [keyof NonNullable<Application["datos"]> | string, st
   ["nivel", "Nivel"],
   ["semestre", "Semestre actual"],
   ["promedio", "Promedio global acumulado"],
-  ["areaStem", "Área STEM"],
   ["declaraNoUltimoAnio", "Declaración de no cursar el último año"],
 ];
 
@@ -47,7 +46,6 @@ export function datosCompletos(app: Application) {
       a.nivel &&
       a.semestre &&
       a.promedio != null &&
-      a.areaStem &&
       a.declaraNoUltimoAnio,
   );
 }
