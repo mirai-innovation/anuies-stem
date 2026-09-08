@@ -8,7 +8,31 @@ import nodemailer from "nodemailer";
 
 const REMITENTE =
   process.env.CORREO_REMITENTE ?? "Reto ANUIES4MX <no-reply@anuies4mx.mx>";
-const BASE = process.env.FRONTEND_URL ?? "http://localhost:3000";
+/** Base para los enlaces de los correos.
+ *
+ *  Un enlace de verificación que apunta a localhost es inservible: la persona
+ *  lo abre en su equipo y no llega a ninguna parte. Por eso la URL no se
+ *  confía a una sola variable escrita a mano.
+ *
+ *  Si el despliegue corre en Vercel y FRONTEND_URL falta —o quedó apuntando a
+ *  localhost porque se importó el archivo de entorno de desarrollo— se usa el
+ *  dominio que Vercel expone. Una URL local en un servidor desplegado nunca es
+ *  la correcta, así que se descarta en lugar de obedecerla. */
+function baseDeEnlaces() {
+  const configurada = process.env.FRONTEND_URL?.trim();
+  const enVercel = Boolean(process.env.VERCEL);
+  const esLocal = /^https?:\/\/(localhost|127\.0\.0\.1)/i.test(configurada ?? "");
+
+  if (configurada && !(enVercel && esLocal)) return configurada.replace(/\/+$/, "");
+
+  const dominio =
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL ?? null;
+  if (dominio) return `https://${dominio}`;
+
+  return "http://localhost:3000";
+}
+
+const BASE = baseDeEnlaces();
 
 function transporte() {
   const user = process.env.EMAIL_USER;

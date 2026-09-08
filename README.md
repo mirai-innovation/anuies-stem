@@ -190,7 +190,7 @@ El repositorio es `rafaelhernandezrios/anuies-stem`.
 1. En <https://vercel.com/new>, importa el repositorio. Next.js se detecta solo; no hace falta tocar los comandos de compilación.
 2. Carga las variables de entorno de la sección anterior en **Settings → Environment Variables**, para *Production*, *Preview* y *Development*.
    - `AUTH_SECRET`: genera uno nuevo con `openssl rand -base64 32`. **No reutilices el de desarrollo.**
-   - `AUTH_URL` y `FRONTEND_URL`: la URL del despliegue, por ejemplo `https://anuies-stem.vercel.app`.
+   - `AUTH_URL` y `FRONTEND_URL`: la URL del despliegue, por ejemplo `https://anuies-stem.vercel.app`. Si importaste por error el archivo de entorno de desarrollo, estas dos quedan apuntando a `localhost` y los enlaces de los correos no llevan a ninguna parte. La app se defiende —en Vercel ignora un `FRONTEND_URL` local y usa el dominio del despliegue— pero conviene dejarlas bien puestas, sobre todo si más adelante hay dominio propio.
 3. Despliega. El `build` corre `prisma generate` antes que `next build`, así que el cliente de Prisma se genera en Vercel sin pasos extra.
 4. **Añade el dominio de Vercel al CORS del bucket de S3** (ver arriba). Sin esto, las subidas fallan en producción aunque funcionen en local.
 5. En MongoDB Atlas, **Network Access**: las funciones de Vercel salen por IPs que cambian, así que hay que permitir `0.0.0.0/0` o contratar direcciones fijas. Es la parte más fácil de olvidar.

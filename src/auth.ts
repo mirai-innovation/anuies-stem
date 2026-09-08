@@ -14,10 +14,14 @@ declare module "next-auth" {
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  // Sesion en JWT firmado dentro de una cookie httpOnly. Con credenciales no
-  // hay adaptador de base de datos, asi que no hay tabla de sesiones que
+  // Sesión en JWT firmado dentro de una cookie httpOnly. Con credenciales no
+  // hay adaptador de base de datos, así que no hay tabla de sesiones que
   // mantener en Mongo.
   session: { strategy: "jwt", maxAge: 60 * 60 * 8 },
+  // Detrás del proxy de Vercel, el host real llega en las cabeceras
+  // reenviadas. Sin esto, Auth.js armaría las URL de retorno con el host
+  // interno y el inicio de sesión rebotaría a un sitio equivocado.
+  trustHost: true,
   pages: { signIn: "/login" },
   providers: [
     Credentials({
