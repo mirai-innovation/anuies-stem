@@ -2,12 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useRef, useState } from "react";
-import {
-  AREAS_STEM,
-  ESTADOS_MEXICO,
-  NIVELES,
-  TECNOLOGIAS,
-} from "@/lib/constantes";
+import { AREAS_STEM, ESTADOS_MEXICO, NIVELES } from "@/lib/constantes";
 import {
   AreaTexto,
   Aviso,
@@ -36,7 +31,6 @@ type Inicial = {
   areaStem: string;
   declaraNoUltimoAnio: boolean;
   nombrePropuesta: string;
-  tecnologia: string;
   problema: string;
   impacto: string;
 };
@@ -335,40 +329,19 @@ export function FormularioDatos({
         <Tarjeta>
           <Etiqueta className="mb-5 text-rosa">Propuesta</Etiqueta>
           <div className="grid gap-4">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Campo
+            <Campo
+              id="nombrePropuesta"
+              etiqueta="Nombre de la propuesta"
+              error={err.nombrePropuesta}
+            >
+              <Entrada
                 id="nombrePropuesta"
-                etiqueta="Nombre de la propuesta"
-                error={err.nombrePropuesta}
-              >
-                <Entrada
-                  id="nombrePropuesta"
-                  name="nombrePropuesta"
-                  defaultValue={inicial.nombrePropuesta}
-                  placeholder="Ej. Sensa · monitoreo agrícola con IA"
-                  aria-invalid={Boolean(err.nombrePropuesta)}
-                />
-              </Campo>
-              <Campo
-                id="tecnologia"
-                etiqueta="Tecnología emergente principal"
-                error={err.tecnologia}
-              >
-                <Seleccion
-                  id="tecnologia"
-                  name="tecnologia"
-                  defaultValue={inicial.tecnologia}
-                  aria-invalid={Boolean(err.tecnologia)}
-                >
-                  <option value="">Selecciona…</option>
-                  {Object.entries(TECNOLOGIAS).map(([v, l]) => (
-                    <option key={v} value={v}>
-                      {l}
-                    </option>
-                  ))}
-                </Seleccion>
-              </Campo>
-            </div>
+                name="nombrePropuesta"
+                defaultValue={inicial.nombrePropuesta}
+                placeholder="Ej. Sensa · monitoreo agrícola con IA"
+                aria-invalid={Boolean(err.nombrePropuesta)}
+              />
+            </Campo>
 
             <Campo
               id="problema"

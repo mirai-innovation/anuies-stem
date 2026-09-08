@@ -1,4 +1,5 @@
 import type { Application } from "@prisma/client";
+import type { TipoVideo } from "@prisma/client";
 import { DOCUMENTOS, PASOS, VIDEOS } from "./constantes";
 
 /** Una sola fuente para "que le falta a esta aplicación".
@@ -26,7 +27,6 @@ export function datosCompletos(app: Application) {
       a.promedio != null &&
       a.areaStem &&
       p?.nombre &&
-      p.tecnologia &&
       p.problema &&
       p.impacto,
   );
@@ -41,16 +41,29 @@ export function videoPropuesta(app: Application) {
   return app.videos.find((v) => v.tipo === "propuesta") ?? null;
 }
 
-/** Devuelve el motivo por el que el video no es aceptable, o null si lo es. */
-export function problemaDeVideo(app: Application) {
-  const video = videoPropuesta(app);
-  if (!video) return "Falta el video de propuesta.";
+/** Devuelve el motivo por el que un video no es aceptable, o null si lo es.
+ *
+ *  Recorre la definición de VIDEOS en lugar de mirar solo el de propuesta:
+ *  cuál es obligatorio es una decisión de la convocatoria, y al cambiarla ahí
+ *  la validación del envío tiene que seguirla sola. */
+export function problemaDeVideo(app: Application, tipo: TipoVideo = "propuesta") {
+  const regla = VIDEOS.find((v) => v.tipo === tipo);
+  if (!regla) return null;
 
-  const limite = VIDEOS.find((v) => v.tipo === "propuesta")!.maxSegundos;
-  if (video.duracionSegundos > limite) {
-    return `El video de propuesta dura ${video.duracionSegundos} s y el límite es ${limite} s.`;
+  const video = app.videos.find((v) => v.tipo === tipo);
+  if (!video) return regla.obligatorio ? `Falta el ${regla.nombre.toLowerCase()}.` : null;
+
+  if (video.duracionSegundos > regla.maxSegundos) {
+    return `El ${regla.nombre.toLowerCase()} dura ${video.duracionSegundos} s y el límite es ${regla.maxSegundos} s.`;
   }
   return null;
+}
+
+/** Todos los motivos pendientes en el paso de videos. */
+export function problemasDeVideos(app: Application) {
+  return VIDEOS.map((v) => problemaDeVideo(app, v.tipo)).filter(
+    (p): p is string => p !== null,
+  );
 }
 
 export function pasoCompleto(app: Application, slug: (typeof PASOS)[number]["slug"]) {
@@ -58,7 +71,7 @@ export function pasoCompleto(app: Application, slug: (typeof PASOS)[number]["slu
     case "datos":
       return datosCompletos(app);
     case "videos":
-      return problemaDeVideo(app) === null;
+      return problemasDeVideos(app).length === 0;
     case "revision":
       return app.estado !== "draft";
   }
@@ -78,8 +91,7 @@ export function faltantesParaEnviar(app: Application): string[] {
     faltantes.push("Completa los datos personales, académicos y la propuesta.");
   }
 
-  const problema = problemaDeVideo(app);
-  if (problema) faltantes.push(problema);
+  faltantes.push(...problemasDeVideos(app));
 
   if (!app.academicos?.declaraNoUltimoAnio) {
     faltantes.push("Falta firmar la declaracion de no cursar el último año del programa.");
@@ -102,10 +114,6 @@ export type ItemChecklist = { label: string; nota: string; ok: boolean };
  *  desglosada punto por punto: la aplicante necesita ver también lo que ya
  *  tiene resuelto, no solo lo que le falta. */
 export function checklist(app: Application, promedioMinimo: number): ItemChecklist[] {
-  const video = videoPropuesta(app);
-  const problema = problemaDeVideo(app);
-  const limite = VIDEOS.find((v) => v.tipo === "propuesta")!.maxSegundos;
-  const presentacion = app.videos.find((v) => v.tipo === "presentacion");
 
   return [
     {
@@ -115,20 +123,20 @@ export function checklist(app: Application, promedioMinimo: number): ItemCheckli
         : "Falta información en el paso 1.",
       ok: datosCompletos(app),
     },
-    {
-      label: `Video de propuesta dentro de ${limite} segundos`,
-      nota: video
-        ? problema ?? `Dura ${video.duracionSegundos} s.`
-        : "Aún no lo subes.",
-      ok: problema === null,
-    },
-    {
-      label: "Video de presentación",
-      nota: presentacion
-        ? `Dura ${presentacion.duracionSegundos} s.`
-        : "Es recomendado, no obligatorio: puedes enviar sin él.",
-      ok: Boolean(presentacion),
-    },
+    // Un renglón por video, en el orden en que se piden.
+    ...VIDEOS.map((regla) => {
+      const subido = app.videos.find((v) => v.tipo === regla.tipo);
+      const problema = problemaDeVideo(app, regla.tipo);
+      return {
+        label: `${regla.nombre} dentro de ${regla.maxSegundos} segundos`,
+        nota: subido
+          ? (problema ?? `Dura ${subido.duracionSegundos} s.`)
+          : regla.obligatorio
+            ? "Aún no lo entregas."
+            : "Es opcional: puedes enviar sin él.",
+        ok: problema === null && Boolean(subido),
+      };
+    }),
     {
       label: "Declaración de no cursar el último año",
       nota: app.academicos?.declaraNoUltimoAnio

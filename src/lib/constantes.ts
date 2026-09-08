@@ -137,31 +137,57 @@ export const VIDEOS: {
   tipo: TipoVideo;
   nombre: string;
   ayuda: string;
+  /** Lo que debe cubrir el video, punto por punto. Una sola línea de ayuda no
+   *  alcanza para explicar qué se espera, y de eso depende que el video sirva
+   *  para evaluar. */
+  puntos: string[];
+  nota?: string;
   maxSegundos: number;
   obligatorio: boolean;
 }[] = [
-  {
-    tipo: "propuesta",
-    nombre: "Video de propuesta",
-    ayuda: "Máximo 90 segundos. Problema, solución y tecnología emergente.",
-    maxSegundos: 90,
-    obligatorio: true,
-  },
+  // El de presentación va primero a propósito: es el más fácil de grabar y
+  // rompe el hielo con la cámara antes de pedir el que sí se califica a fondo.
   {
     tipo: "presentacion",
     nombre: "Video de presentación",
-    ayuda: "Hasta 60 segundos. Quién eres, qué estudias y por qué quieres participar.",
+    ayuda:
+      "Háblanos de ti y de por qué quieres participar. Este video no es sobre tu propuesta: es sobre tu motivación, y eso es lo que el comité evalúa aquí.",
+    puntos: [
+      "Quién eres, qué estudias y en qué universidad.",
+      "Qué te movió a postularte al Reto ANUIES4MX.",
+      "Qué esperas llevarte de los cinco días en Valle de Bravo.",
+    ],
+    nota: "No hace falta producción ni guion: interesa lo que cuentas, no cómo se ve.",
     maxSegundos: 60,
-    obligatorio: false,
+    obligatorio: true,
+  },
+  {
+    tipo: "propuesta",
+    nombre: "Video de propuesta",
+    ayuda:
+      "Presenta tu propuesta de negocio. Debe cubrir los componentes que pide la convocatoria, porque es con este video con el que se califica tu idea.",
+    puntos: [
+      "El problema u oportunidad que detectaste, y a quién afecta.",
+      "La solución que propones.",
+      "La tecnología emergente que usarías: IA, VR/AR, Robótica, Blockchain o Cómputo en la Nube.",
+      "El impacto social esperado.",
+      "Por qué es viable, técnica y económicamente.",
+    ],
+    maxSegundos: 90,
+    obligatorio: true,
   },
 ];
 
-/** Cómo se captura cada video. El de propuesta se produce aparte y se sube; el
- *  de presentación se graba en el momento con la cámara, así que no hay
- *  archivo que preparar ni exportar. */
-export const CAPTURA_VIDEO: Record<TipoVideo, "archivo" | "camara"> = {
-  propuesta: "archivo",
+/** Cómo se captura cada video.
+ *
+ *  La presentación se graba en el momento: es espontánea por diseño y pedir un
+ *  archivo la volvería un trámite. La propuesta admite las dos vías, porque
+ *  hay quien quiere editarla con apoyos visuales y quien prefiere resolverla
+ *  frente a la cámara; obligar a una sola forma penalizaría a alguien sin
+ *  relación con la calidad de su idea. */
+export const CAPTURA_VIDEO: Record<TipoVideo, "camara" | "ambas"> = {
   presentacion: "camara",
+  propuesta: "ambas",
 };
 
 /** Límites de archivo. Se aplican en las condiciones del POST firmado, que

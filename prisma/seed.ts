@@ -697,6 +697,17 @@ async function main() {
         videos: enviada
           ? [
               {
+                // El de presentación se graba con la cámara, así que en la
+                // realidad llega como WebM.
+                tipo: "presentacion" as const,
+                blobPathname: `seed/${s.folio}/presentacion.webm`,
+                nombreOriginal: "presentacion.webm",
+                tamanoBytes: 3_000_000 + ((i * 811_237) % 4_000_000),
+                contentType: "video/webm",
+                duracionSegundos: 38 + (i % 20),
+                resumen: null,
+              },
+              {
                 tipo: "propuesta" as const,
                 blobPathname: `seed/${s.folio}/propuesta.mp4`,
                 nombreOriginal: `propuesta_${s.proyecto.toLowerCase().replace(/\s+/g, "_")}.mp4`,

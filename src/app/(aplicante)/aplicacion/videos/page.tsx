@@ -17,9 +17,9 @@ export default async function PasoVideos() {
     <>
       <Etiqueta className="tracking-[0.14em]">{etiquetaPaso("videos")}</Etiqueta>
       <Titulo className="mb-2 mt-1.5 text-[40px]">Videos</Titulo>
-      <p className="mb-6 max-w-[70ch] text-sm leading-relaxed text-gris text-pretty">
-        El video de propuesta lo produces por tu cuenta y lo subes aquí (MP4 o MOV, hasta 500 MB).
-        El de presentación se graba en el momento con la cámara de tu equipo.
+      <p className="mb-6 max-w-[72ch] text-sm leading-relaxed text-gris text-pretty">
+        Son dos videos y evalúan cosas distintas: el primero, quién eres y qué te mueve; el
+        segundo, tu propuesta. Grábalos por separado.
       </p>
       <NavPasos />
       <ListaVideos
@@ -30,6 +30,8 @@ export default async function PasoVideos() {
             tipo: v.tipo,
             nombre: v.nombre,
             ayuda: v.ayuda,
+            puntos: [...v.puntos],
+            nota: v.nota ?? null,
             maxSegundos: v.maxSegundos,
             obligatorio: v.obligatorio,
             subido: sub

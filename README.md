@@ -121,10 +121,14 @@ La postulación son **tres pasos**: datos, videos y envío. No se piden document
 
 Los **cinco documentos oficiales se integran después**, en `/expediente`, y solo los entregan las aplicantes que recibieron dictamen favorable. La etapa aparece bloqueada en el tablero desde el principio —con la lista a la vista, para que nadie se lleve una sorpresa— y se habilita al publicar resultados. Pedir cinco constancias por adelantado a cientos de estudiantes, cuando la mayoría no será seleccionada, carga de trámites a quienes no los van a necesitar y a las áreas escolares que los emiten.
 
-Los dos videos se capturan distinto:
+Los dos videos son obligatorios y evalúan cosas distintas, así que se piden en este orden:
 
-- **Propuesta** (obligatorio, hasta 90 s): se produce aparte y se sube como MP4 o MOV.
-- **Presentación** (recomendado, hasta 60 s): se **graba en el momento** con la cámara del equipo. La grabación se detiene sola al llegar al límite, se puede repetir cuantas veces se quiera y no exige exportar ni preparar ningún archivo.
+1. **Presentación** (hasta 60 s): quién es, qué estudia y por qué quiere participar. **No es sobre la propuesta**: aquí se evalúa la motivación. Se graba en el momento con la cámara; va primero porque es el más fácil de hacer y rompe el hielo antes del que sí se califica a fondo.
+2. **Propuesta** (hasta 90 s): la idea de negocio, con los componentes que pide la convocatoria. Admite las dos vías —grabar con la cámara o subir un archivo— porque hay quien quiere editarlo con apoyos visuales y quien prefiere resolverlo frente a la cámara; obligar a una sola forma penalizaría a alguien por algo que no tiene que ver con la calidad de su idea.
+
+Cada video muestra en pantalla, punto por punto, qué debe incluir. Una sola línea de ayuda no alcanza para explicarlo, y de eso depende que el video sirva para evaluar.
+
+**La tecnología emergente no se le pregunta a la aplicante.** La clasifica la evaluación por IA a partir de la propuesta escrita, entre las cinco de la convocatoria. Se hace así porque de ese dato dependen el filtro de la lista, el conteo del panel y la sugerencia de equipos del Demo Day: quitarlo del formulario sin más habría dejado esas tres cosas vacías.
 
 ## Decisiones que conviene conocer
 

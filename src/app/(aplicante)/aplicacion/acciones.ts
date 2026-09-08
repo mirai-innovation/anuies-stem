@@ -56,7 +56,6 @@ const EsquemaDatos = z.object({
     .or(z.literal("")),
   declaraNoUltimoAnio: z.string().optional(),
   nombrePropuesta: texto(120),
-  tecnologia: z.enum(["ia", "vr_ar", "robotica", "blockchain_web3", "nube"]).or(z.literal("")),
   problema: texto(800),
   impacto: texto(800),
 });
@@ -105,7 +104,6 @@ function validarDatos(d: z.infer<typeof EsquemaDatos>, promedioMinimo: number) {
   }
 
   if (!d.nombrePropuesta) e.nombrePropuesta = "Escribe el nombre de tu propuesta.";
-  if (!d.tecnologia) e.tecnologia = "Selecciona la tecnología emergente principal.";
   if (!d.problema) e.problema = "Describe el problema u oportunidad.";
   if (!d.impacto) e.impacto = "Describe el impacto social esperado.";
 
@@ -167,7 +165,10 @@ export async function guardarDatos(
       },
       propuesta: {
         nombre: d.nombrePropuesta || null,
-        tecnologia: d.tecnologia || null,
+        // La tecnología ya no se le pregunta a la aplicante: la clasifica la
+        // evaluación por IA a partir de la propuesta escrita. Se conserva lo
+        // que hubiera para no perderlo al guardar.
+        tecnologia: app.propuesta?.tecnologia ?? null,
         problema: d.problema || null,
         impacto: d.impacto || null,
       },

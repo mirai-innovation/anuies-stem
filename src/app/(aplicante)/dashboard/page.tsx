@@ -132,14 +132,61 @@ export default async function Dashboard() {
             )}
           </Tarjeta>
 
-          <Tarjeta tono="teal">
-            <Etiqueta className="mb-3 text-teal-oscuro">Criterios con que serás evaluada</Etiqueta>
-            <ol className="m-0 grid list-decimal gap-2 pl-5 text-[13px] leading-snug text-tinta">
-              {CRITERIOS.map((c) => (
-                <li key={c.clave}>{c.nombre}</li>
-              ))}
-            </ol>
-          </Tarjeta>
+          {/* Antes de enviar interesan los criterios, que sirven para armar la
+              propuesta. Después ya no son accionables: lo que hace falta saber
+              es qué viene, y sobre todo que los documentos se piden más
+              adelante y solo si resulta seleccionada. */}
+          {app.estado === "draft" ? (
+            <Tarjeta tono="teal">
+              <Etiqueta className="mb-3 text-teal-oscuro">Criterios con que serás evaluada</Etiqueta>
+              <ol className="m-0 grid list-decimal gap-2 pl-5 text-[13px] leading-snug text-tinta">
+                {CRITERIOS.map((c) => (
+                  <li key={c.clave}>{c.nombre}</li>
+                ))}
+              </ol>
+            </Tarjeta>
+          ) : (
+            <Tarjeta tono="teal">
+              <Etiqueta className="mb-4 text-teal-oscuro">Qué sigue</Etiqueta>
+              <ol className="m-0 grid list-none gap-4 p-0">
+                {[
+                  {
+                    n: "01",
+                    titulo: "Evaluación del comité",
+                    texto: `Del ${fechaCorta(edicion.evaluacionInicia)} al ${fechaCorta(edicion.evaluacionTermina)}. No tienes que hacer nada durante este periodo.`,
+                  },
+                  {
+                    n: "02",
+                    titulo: "Publicación de resultados",
+                    texto: `El ${fechaCorta(edicion.resultadosPublicadosEn ?? edicion.resultadosPrevistos)} podrás ver tu dictamen, tu puntaje por criterio y la retroalimentación del comité.`,
+                  },
+                  {
+                    n: "03",
+                    titulo: "Si resultas seleccionada",
+                    texto: `Confirmas tu participación (del ${fechaCorta(edicion.confirmacionAbre)} al ${fechaCorta(edicion.confirmacionCierra)}) y se habilita la entrega de tus cinco documentos oficiales. Hasta entonces no necesitas reunir ninguno.`,
+                    destacado: true,
+                  },
+                ].map((p) => (
+                  <li key={p.n} className="grid grid-cols-[26px_1fr] gap-3">
+                    <span
+                      className={`font-mono text-[12px] ${p.destacado ? "font-semibold text-rosa" : "text-teal-oscuro"}`}
+                    >
+                      {p.n}
+                    </span>
+                    <div>
+                      <div className="text-[13.5px] font-semibold text-tinta">{p.titulo}</div>
+                      <p className="mt-1 text-[12.5px] leading-relaxed text-tinta/85">{p.texto}</p>
+                      {p.destacado && (
+                        <BotonEnlace href="/expediente" variante="secundario" className="mt-3">
+                          Ver qué documentos se piden
+                        </BotonEnlace>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </Tarjeta>
+          )}
         </div>
       </div>
     </div>

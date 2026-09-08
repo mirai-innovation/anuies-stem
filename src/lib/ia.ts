@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import type { Application, Universidad } from "@prisma/client";
+import type { Application, Tecnologia, Universidad } from "@prisma/client";
 import { db } from "./db";
 import { AREAS_STEM, CRITERIOS, NIVELES, TECNOLOGIAS, VIDEOS } from "./constantes";
 
@@ -30,8 +30,14 @@ export function iaConfigurada() {
 const ESQUEMA = {
   type: "object",
   additionalProperties: false,
-  required: ["resumen", "criterios", "scoreGlobal"],
+  required: ["resumen", "criterios", "scoreGlobal", "tecnologia"],
   properties: {
+    tecnologia: {
+      type: "string",
+      enum: ["ia", "vr_ar", "robotica", "blockchain_web3", "nube"],
+      description:
+        "Tecnología emergente principal de la propuesta: ia (Inteligencia Artificial), vr_ar (Realidad Virtual o Aumentada), robotica, blockchain_web3, nube (Cómputo en la Nube). Elige la que domine la solución; si ninguna domina con claridad, elige la que más peso tenga.",
+    },
     resumen: {
       type: "string",
       description: "Resumen de la propuesta en dos o tres líneas, en español de México.",
@@ -69,6 +75,7 @@ Reglas:
 - Si un dato no está en la información recibida, dilo explícitamente en la justificación en lugar de suponerlo.
 - El criterio "Presentación del video" solo puede juzgarse con la transcripción. Si no la recibes, asigna 3 y declara en la justificación que no había transcripción disponible.
 - El scoreGlobal es el promedio de los cinco puntajes, con un decimal.
+- Además, clasifica la propuesta en una de las cinco tecnologías emergentes de la convocatoria. Esta clasificación se usa para armar los equipos del Demo Day, así que elige la que realmente domina la solución.
 - Tu evaluación es un insumo informativo: nunca sustituye al comité humano.`;
 
 function prompt(app: Application, universidad: Universidad | null, transcripcion: string | null) {
@@ -187,6 +194,7 @@ export async function evaluarConIA(applicationId: string): Promise<ResultadoIA> 
         resumen: string;
         criterios: { criterio: string; score: number; justificacion: string }[];
         scoreGlobal: number;
+        tecnologia: Tecnologia;
       };
 
       // Se reordenan según el orden fijo del brief; el modelo podría
@@ -232,6 +240,16 @@ export async function evaluarConIA(applicationId: string): Promise<ResultadoIA> 
           generadaEn: new Date(),
         },
       });
+
+      // La tecnología ya no se le pregunta a la aplicante, así que la deja
+      // fijada esta clasificación. De ella dependen el filtro de la lista, el
+      // conteo del panel y la sugerencia de equipos del Demo Day.
+      if (TECNOLOGIAS[datos.tecnologia]) {
+        await db.application.update({
+          where: { id: applicationId },
+          data: { propuesta: { ...app.propuesta, tecnologia: datos.tecnologia } },
+        });
+      }
 
       return { ok: true };
     } catch (e) {

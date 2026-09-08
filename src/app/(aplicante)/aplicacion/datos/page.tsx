@@ -49,7 +49,6 @@ export default async function PasoDatos() {
           areaStem: app.academicos?.areaStem ?? "",
           declaraNoUltimoAnio: app.academicos?.declaraNoUltimoAnio ?? false,
           nombrePropuesta: app.propuesta?.nombre ?? "",
-          tecnologia: app.propuesta?.tecnologia ?? "",
           problema: app.propuesta?.problema ?? "",
           impacto: app.propuesta?.impacto ?? "",
         }}

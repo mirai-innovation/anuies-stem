@@ -15,11 +15,16 @@ type Fase = "inactiva" | "pidiendo" | "lista" | "grabando" | "revisando" | "subi
  *  Requiere HTTPS o localhost; los navegadores no dan acceso a la cámara en
  *  conexiones sin cifrar. */
 export function GrabadorCamara({
+  titulo,
   maxSegundos,
   subiendo,
   progreso,
   onGrabacion,
 }: {
+  /** El grabador sirve para los dos videos, así que el encabezado lo pone
+   *  quien lo usa: decir "graba tu presentación" sobre el video de propuesta
+   *  confundiría justo donde hay que ser claro. */
+  titulo: string;
   maxSegundos: number;
   subiendo: boolean;
   progreso: number | null;
@@ -190,7 +195,7 @@ export function GrabadorCamara({
           <div className="absolute inset-0 grid place-items-center bg-tinta">
             <div className="px-6 text-center">
               <div className="font-titulo text-[22px] font-bold uppercase text-gris-claro">
-                Graba tu presentación
+                {titulo}
               </div>
               <p className="mx-auto mt-2 max-w-[42ch] text-[12.5px] leading-relaxed text-gris-claro">
                 Se graba aquí mismo con tu cámara. Se detiene sola a los {maxSegundos} segundos y
