@@ -193,10 +193,15 @@ model Edicion {
   id                     String    @id @default(auto()) @map("_id") @db.ObjectId
   clave                  String    @unique // "2026"
   nombre                 String
+  lanzamiento            DateTime
   cierreRecepcion        DateTime
   evaluacionInicia       DateTime
   evaluacionTermina      DateTime
-  resultadosPublicadosEn DateTime? // null = resultados no publicados
+  // Fecha anunciada en la convocatoria. Es lo que se le promete a la
+  // aplicante y lo que se muestra mientras no haya publicación.
+  resultadosPrevistos    DateTime
+  // Momento real en que el administrador publicó. null = aún no se publican.
+  resultadosPublicadosEn DateTime?
   confirmacionAbre       DateTime
   confirmacionCierra     DateTime
   eventoInicia           DateTime

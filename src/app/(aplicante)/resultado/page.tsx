@@ -48,7 +48,7 @@ export default async function Resultado() {
     return (
       <div className="max-w-[1000px] px-8 pb-16 pt-10">
         <Etiqueta className="tracking-[0.14em]">
-          Resultados · se publican el {fechaCorta(edicion.resultadosPublicadosEn ?? edicion.evaluacionTermina)}
+          Resultados · se publican el {fechaCorta(edicion.resultadosPublicadosEn ?? edicion.resultadosPrevistos)}
         </Etiqueta>
         <Titulo className="mb-6 mt-1.5 text-[40px]">Evaluación de mi aplicación</Titulo>
 

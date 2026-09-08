@@ -123,7 +123,7 @@ export default async function Dashboard() {
                 <p className="mb-5 mt-3 text-[13.5px] leading-relaxed text-gris-claro">
                   {resultadosPublicados(edicion)
                     ? "El comité publicó los dictámenes. Revisa tu puntaje y la retroalimentación."
-                    : `Entra al periodo de evaluación (${fechaCorta(edicion.evaluacionInicia)} — ${fechaCorta(edicion.evaluacionTermina)}). Los resultados se publican el ${fechaCorta(edicion.resultadosPublicadosEn ?? edicion.evaluacionTermina)}.`}
+                    : `Entra al periodo de evaluación (${fechaCorta(edicion.evaluacionInicia)} — ${fechaCorta(edicion.evaluacionTermina)}). Los resultados se publican el ${fechaCorta(edicion.resultadosPublicadosEn ?? edicion.resultadosPrevistos)}.`}
                 </p>
                 <BotonEnlace href="/resultado" variante="brillante">
                   Ver mi resultado →

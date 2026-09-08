@@ -34,7 +34,7 @@ function hitos(app: Application, edicion: Edicion, publicados: boolean): Hito[] 
       hecho: ahora > edicion.evaluacionTermina,
     },
     {
-      fecha: fechaCorta(edicion.resultadosPublicadosEn ?? edicion.evaluacionTermina),
+      fecha: fechaCorta(edicion.resultadosPublicadosEn ?? edicion.resultadosPrevistos),
       etapa: "Publicación de resultados",
       nota: publicados ? "Ya puedes consultar tu dictamen." : "Aún no se publican.",
       hecho: publicados,

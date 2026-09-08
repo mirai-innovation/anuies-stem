@@ -550,11 +550,14 @@ async function main() {
     data: {
       clave: "2026",
       nombre: "Reto ANUIES4MX 2026 · Mujeres en STEM",
+      lanzamiento: cst("2026-09-07T00:00:00"),
       cierreRecepcion: cst("2026-11-15T23:59:59"),
       evaluacionInicia: cst("2026-11-16T00:00:00"),
       evaluacionTermina: cst("2026-11-22T23:59:59"),
+      // Fecha anunciada en la convocatoria.
+      resultadosPrevistos: cst("2026-11-23T00:00:00"),
       // Arranca sin publicar: /resultado debe mostrar "en evaluación" hasta
-      // que el admin ejecute la accion de publicar.
+      // que el administrador ejecute la acción de publicar.
       resultadosPublicadosEn: null,
       confirmacionAbre: cst("2026-11-24T00:00:00"),
       confirmacionCierra: cst("2026-11-30T23:59:59"),
