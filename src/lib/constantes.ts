@@ -175,6 +175,9 @@ export const TIPOS_VIDEO = ["video/mp4", "video/quicktime"];
 export const TIPOS_GRABACION = ["video/webm", "video/mp4", "video/quicktime"];
 /** Un minuto de webcam pesa unos pocos MB; no hay razón para admitir 500. */
 export const MAX_GRABACION_BYTES = 120 * 1024 * 1024;
+/** Y por abajo: un WebM de un centenar de bytes es la cabecera del contenedor
+ *  sin un solo fotograma. Aceptarlo produce un video que nadie puede abrir. */
+export const MIN_GRABACION_BYTES = 8 * 1024;
 
 export const ESTADOS_MEXICO = [
   "Aguascalientes", "Baja California", "Baja California Sur", "Campeche",

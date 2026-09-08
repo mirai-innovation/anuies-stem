@@ -58,6 +58,10 @@ export function autorizacionDeSubida(
   key: string,
   contentType: string,
   maxBytes: number,
+  /** Mínimo aceptable. Existe porque un archivo diminuto no es un archivo
+   *  pequeño: es uno roto. Una grabación que solo trae la cabecera del
+   *  contenedor pesa un centenar de bytes y no se puede reproducir. */
+  minBytes = 1,
   segundos = 900,
 ) {
   return createPresignedPost(s3(), {
@@ -65,7 +69,7 @@ export function autorizacionDeSubida(
     Key: key,
     Expires: segundos,
     Conditions: [
-      ["content-length-range", 1, maxBytes],
+      ["content-length-range", minBytes, maxBytes],
       ["eq", "$Content-Type", contentType],
     ],
     Fields: { "Content-Type": contentType },

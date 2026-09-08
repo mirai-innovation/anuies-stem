@@ -77,28 +77,47 @@ export function GrabadorCamara({
     }
   }
 
-  function mejorFormato() {
-    // Chrome y Firefox dan WebM; Safari da MP4. Se toma el primero admitido.
-    const candidatos = [
-      "video/webm;codecs=vp9,opus",
-      "video/webm;codecs=vp8,opus",
-      "video/webm",
-      "video/mp4",
-    ];
+  /** Elige el formato según lo que la cámara entregó de verdad.
+   *
+   *  Pedir un contenedor con pista de audio (`opus`) cuando el micrófono no
+   *  produce muestras hace que el muxer de Chrome no cierre ningún bloque: el
+   *  archivo sale con la cabecera y nada más. Por eso el códec de audio solo
+   *  se pide si el stream trae una pista de audio viva. */
+  function mejorFormato(s: MediaStream) {
+    const conAudio = s.getAudioTracks().some((t) => t.readyState === "live");
+    const candidatos = conAudio
+      ? [
+          "video/webm;codecs=vp9,opus",
+          "video/webm;codecs=vp8,opus",
+          "video/webm",
+          "video/mp4",
+        ]
+      : ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm", "video/mp4"];
     return candidatos.find((t) => MediaRecorder.isTypeSupported(t)) ?? "";
   }
+
+  /** Una grabación real pesa decenas de KB por segundo. Por debajo de este
+   *  umbral lo que hay es una cabecera sin contenido, y conviene decirlo en
+   *  vez de dejar subir un archivo que no se puede reproducir. */
+  const MINIMO_BYTES = 8 * 1024;
 
   function grabar() {
     if (!stream.current) return;
     setError(null);
     trozos.current = [];
 
-    const mimeType = mejorFormato();
+    const mimeType = mejorFormato(stream.current);
     const mr = new MediaRecorder(stream.current, mimeType ? { mimeType } : undefined);
     grabadora.current = mr;
 
     mr.ondataavailable = (e) => {
       if (e.data.size > 0) trozos.current.push(e.data);
+    };
+
+    mr.onerror = () => {
+      if (reloj.current) clearInterval(reloj.current);
+      setFase("lista");
+      setError("La grabación se interrumpió. Vuelve a intentarlo.");
     };
 
     mr.onstop = () => {
@@ -107,6 +126,18 @@ export function GrabadorCamara({
       const tipo = mimeType.split(";")[0] || "video/webm";
       const extension = tipo.includes("mp4") ? "mp4" : "webm";
       const blob = new Blob(trozos.current, { type: tipo });
+
+      // Se comprueba antes de ofrecerla: subir un archivo vacío y descubrirlo
+      // al intentar reproducirlo es la peor forma de enterarse.
+      if (blob.size < MINIMO_BYTES) {
+        if (preview.current) preview.current.srcObject = stream.current;
+        setFase("lista");
+        setError(
+          "La grabación salió vacía. Suele pasar si el navegador perdió el acceso a la cámara o al micrófono a media grabación. Revisa los permisos y vuelve a intentarlo.",
+        );
+        return;
+      }
+
       const archivo = new File([blob], `presentacion.${extension}`, { type: tipo });
       setGrabado({ url: URL.createObjectURL(blob), archivo, segundos });
       setFase("revisando");
@@ -115,7 +146,10 @@ export function GrabadorCamara({
 
     inicio.current = Date.now();
     setTranscurrido(0);
-    mr.start();
+    // Con un intervalo, los datos se entregan durante la grabación en lugar de
+    // solo al detenerla. Si la entrega final falla, lo grabado hasta ese punto
+    // ya está a salvo.
+    mr.start(1000);
     setFase("grabando");
 
     reloj.current = setInterval(() => {

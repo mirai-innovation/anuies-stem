@@ -9,6 +9,7 @@ import {
   DOCUMENTOS,
   MAX_GRABACION_BYTES,
   MAX_PDF_BYTES,
+  MIN_GRABACION_BYTES,
   MAX_VIDEO_BYTES,
   TIPOS_GRABACION,
   TIPOS_PDF,
@@ -71,16 +72,30 @@ export type ClaseArchivo = "documento" | "video" | "grabacion";
  *  pocos MB. */
 function reglas(clase: ClaseArchivo) {
   if (clase === "documento") {
-    return { tipos: TIPOS_PDF, maximo: MAX_PDF_BYTES, error: "El documento debe ser un PDF." };
+    return {
+      tipos: TIPOS_PDF,
+      maximo: MAX_PDF_BYTES,
+      minimo: 1024,
+      error: "El documento debe ser un PDF.",
+    };
   }
   if (clase === "grabacion") {
     return {
       tipos: TIPOS_GRABACION,
       maximo: MAX_GRABACION_BYTES,
+      // Una grabación real pesa decenas de KB por segundo. Por debajo de esto
+      // lo que llegó es la cabecera del contenedor sin un solo fotograma, y
+      // aceptarla produce un video que nadie puede reproducir.
+      minimo: MIN_GRABACION_BYTES,
       error: "La grabación debe venir de la cámara del navegador.",
     };
   }
-  return { tipos: TIPOS_VIDEO, maximo: MAX_VIDEO_BYTES, error: "El video debe ser MP4 o MOV." };
+  return {
+    tipos: TIPOS_VIDEO,
+    maximo: MAX_VIDEO_BYTES,
+    minimo: 1024,
+    error: "El video debe ser MP4 o MOV.",
+  };
 }
 
 export async function autorizarSubida(datos: {
@@ -98,7 +113,7 @@ export async function autorizarSubida(datos: {
     // Cada clase tiene su propia ventana: los videos son parte de la
     // postulación y los documentos, del expediente posterior.
     const { app } = esDocumento ? await expedienteEditable() : await borradorEditable();
-    const { tipos, maximo, error } = reglas(datos.clase);
+    const { tipos, maximo, minimo, error } = reglas(datos.clase);
 
     // El navegador añade el códec al tipo, por ejemplo "video/webm;codecs=vp9".
     const tipoBase = datos.contentType.split(";")[0].trim();
@@ -107,11 +122,19 @@ export async function autorizarSubida(datos: {
     if (datos.tamanoBytes > maximo) {
       return { error: `El archivo pesa ${pesoArchivo(datos.tamanoBytes)} y el máximo es ${pesoArchivo(maximo)}.` };
     }
+    if (datos.tamanoBytes < minimo) {
+      return {
+        error:
+          datos.clase === "grabacion"
+            ? "La grabación salió vacía: no contiene video. Vuelve a grabarla."
+            : `El archivo pesa ${pesoArchivo(datos.tamanoBytes)} y está incompleto o dañado.`,
+      };
+    }
 
     const key = llave(app.folio, esDocumento ? "documentos" : "videos", datos.nombreArchivo);
     // El máximo va en la política: S3 rechaza el archivo si se pasa, sin que
     // los bytes lleguen a ocupar espacio en el bucket.
-    const { url, fields } = await autorizacionDeSubida(key, tipoBase, maximo);
+    const { url, fields } = await autorizacionDeSubida(key, tipoBase, maximo, minimo);
     return { url, campos: fields, key };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "No se pudo autorizar la subida." };
@@ -181,7 +204,7 @@ export async function confirmarVideo(
     if (!regla) return { error: "Tipo de video desconocido." };
 
     const esGrabacion = segundosDeclarados !== undefined;
-    const { tipos, maximo } = reglas(esGrabacion ? "grabacion" : "video");
+    const { tipos, maximo, minimo } = reglas(esGrabacion ? "grabacion" : "video");
 
     const meta = await metadatos(key);
     const tipoBase = meta.contentType.split(";")[0].trim();
@@ -192,6 +215,16 @@ export async function confirmarVideo(
     if (meta.tamanoBytes > maximo) {
       await borrar(key);
       return { error: `El video pesa ${pesoArchivo(meta.tamanoBytes)} y el máximo es ${pesoArchivo(maximo)}.` };
+    }
+    // Segunda barrera sobre el objeto ya subido: si llegó una cabecera sin
+    // contenido, se borra en lugar de registrarla como si fuera un video.
+    if (meta.tamanoBytes < minimo) {
+      await borrar(key);
+      return {
+        error: esGrabacion
+          ? "La grabación llegó vacía al servidor: no contiene video. Vuelve a grabarla."
+          : "El video llegó incompleto. Vuelve a subirlo.",
+      };
     }
 
     // La duración se lee del archivo ya subido, no de lo que informó el
