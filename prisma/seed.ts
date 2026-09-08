@@ -76,8 +76,8 @@ type Semilla = {
   impacto: string;
   estado: EstadoAplicacion;
   duracionVideo: number;
-  /** Documentos del expediente. Solo tienen sentido para las seleccionadas:
-   *  el expediente se integra después de publicar resultados. */
+  /** Cuántos de los cinco documentos entregó. Solo aplica a las enviadas: la
+   *  entrega se habilita al postular y cierra con la convocatoria. */
   docs: number;
   dictamen?: Dictamen;
   /** Puntajes fijados a mano para que el registro coincida con el diseno
@@ -109,7 +109,7 @@ const APLICANTES: Semilla[] = [
       "Reducir pérdidas de cosecha en unidades de producción familiar mediante diagnóstico temprano desde un teléfono, sin conexión permanente a internet.",
     estado: "evaluated",
     duracionVideo: 84,
-    docs: 5,
+    docs: 3,
     dictamen: "selected",
     fijo: {
       // Cada evaluador promedia 4.4, asi que el promedio del comite es 4.4.
@@ -141,7 +141,7 @@ const APLICANTES: Semilla[] = [
       "Tamizaje respiratorio de bajo costo a partir de audio de tos, para priorizar referencias en centros de salud sin radiologo.",
     estado: "evaluated",
     duracionVideo: 89,
-    docs: 5,
+    docs: 4,
     dictamen: "selected",
   },
   {
@@ -675,8 +675,9 @@ async function main() {
           problema: s.problema,
           impacto: s.impacto,
         },
-        // El expediente solo existe para quien ya fue seleccionada.
-        documentos: (s.dictamen === "selected"
+        // Los documentos se entregan tras enviar la postulación, así que un
+        // borrador no tiene ninguno.
+        documentos: (enviada
           ? [
               "constancia_inscripcion",
               "relacion_estudios",

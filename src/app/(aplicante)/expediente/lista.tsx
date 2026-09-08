@@ -16,7 +16,7 @@ type Fila = {
   subido: { nombreOriginal: string; tamanoBytes: number; subidoEn: string } | null;
 };
 
-function FilaDocumento({ fila }: { fila: Fila }) {
+function FilaDocumento({ fila, soloLectura }: { fila: Fila; soloLectura?: boolean }) {
   const router = useRouter();
   const { estado, input, manejar, limpiarError } = useSubida(
     "documento",
@@ -53,26 +53,30 @@ function FilaDocumento({ fila }: { fila: Fila }) {
               Ver PDF
             </Link>
           )}
-          <label
-            htmlFor={idInput}
-            className={`inline-flex cursor-pointer items-center border border-linea-fuerte px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.08em] hover:border-rosa hover:text-rosa ${
-              ocupado ? "pointer-events-none opacity-45" : ""
-            }`}
-          >
-            {fila.subido ? "Reemplazar" : "Subir PDF"}
-          </label>
-          <input
-            id={idInput}
-            ref={input}
-            type="file"
-            accept="application/pdf"
-            className="sr-only"
-            disabled={ocupado}
-            onChange={(e) => {
-              const a = e.target.files?.[0];
-              if (a) void manejar(a);
-            }}
-          />
+          {!soloLectura && (
+            <>
+              <label
+                htmlFor={idInput}
+                className={`inline-flex cursor-pointer items-center border border-linea-fuerte px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.08em] hover:border-rosa hover:text-rosa ${
+                  ocupado ? "pointer-events-none opacity-45" : ""
+                }`}
+              >
+                {fila.subido ? "Reemplazar" : "Subir PDF"}
+              </label>
+              <input
+                id={idInput}
+                ref={input}
+                type="file"
+                accept="application/pdf"
+                className="sr-only"
+                disabled={ocupado}
+                onChange={(e) => {
+                  const a = e.target.files?.[0];
+                  if (a) void manejar(a);
+                }}
+              />
+            </>
+          )}
         </div>
       </div>
 
@@ -101,7 +105,15 @@ function FilaDocumento({ fila }: { fila: Fila }) {
   );
 }
 
-export function ListaDocumentos({ documentos, cierre }: { documentos: Fila[]; cierre: string }) {
+export function ListaDocumentos({
+  documentos,
+  cierre,
+  soloLectura,
+}: {
+  documentos: Fila[];
+  cierre: string;
+  soloLectura?: boolean;
+}) {
   const faltan = documentos.filter((d) => !d.subido).length;
   const entregados = documentos.length - faltan;
 
@@ -118,9 +130,11 @@ export function ListaDocumentos({ documentos, cierre }: { documentos: Fila[]; ci
         </div>
         <Barra valor={entregados / documentos.length} tono={faltan === 0 ? "teal" : "rosa"} />
         <p className="mt-4 text-[13px] leading-relaxed text-gris">
-          {faltan === 0
-            ? "Tu expediente está completo. Puedes reemplazar cualquier documento hasta el cierre."
-            : `Tienes hasta el ${cierre} para entregar los ${faltan === 1 ? "documentos restantes" : "documentos restantes"}.`}
+          {soloLectura
+            ? "La entrega está cerrada."
+            : faltan === 0
+              ? `Tu expediente está completo. Puedes reemplazar cualquier documento hasta el ${cierre}.`
+              : `Te ${faltan === 1 ? "falta 1 documento" : `faltan ${faltan} documentos`}. Tienes hasta el ${cierre}.`}
         </p>
       </Tarjeta>
 
@@ -134,7 +148,7 @@ export function ListaDocumentos({ documentos, cierre }: { documentos: Fila[]; ci
           </div>
         </div>
         {documentos.map((d) => (
-          <FilaDocumento key={d.tipo} fila={d} />
+          <FilaDocumento key={d.tipo} fila={d} soloLectura={soloLectura} />
         ))}
       </Tarjeta>
     </>

@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import type { Application, Tecnologia, Universidad } from "@prisma/client";
 import { db } from "./db";
-import { AREAS_STEM, CRITERIOS, NIVELES, TECNOLOGIAS, VIDEOS } from "./constantes";
+import { AREAS_STEM, CRITERIOS, DOCUMENTOS, NIVELES, TECNOLOGIAS, VIDEOS } from "./constantes";
 
 /** Evaluación por IA de una aplicación.
  *
@@ -109,11 +109,12 @@ VIDEO DE PROPUESTA
 
 /** Comprobaciones deterministas contra la base.
  *
- *  No incluyen los documentos: el expediente se integra después de la
- *  publicación de resultados y solo lo entregan las seleccionadas, así que en
- *  el momento de evaluar no hay nada que revisar ahí. */
+ *  Incluyen el expediente porque la evaluación empieza al día siguiente del
+ *  cierre, y para entonces los cinco documentos ya debían estar entregados. */
 function verificaciones(app: Application, universidad: Universidad | null, promedioMinimo: number) {
   const video = app.videos.find((v) => v.tipo === "propuesta");
+  const entregados = new Set(app.documentos.map((d) => d.tipo));
+  const faltantes = DOCUMENTOS.filter((d) => !entregados.has(d.tipo));
   const limite = VIDEOS.find((v) => v.tipo === "propuesta")!.maxSegundos;
 
   return [
@@ -136,6 +137,13 @@ function verificaciones(app: Application, universidad: Universidad | null, prome
     {
       label: `Video de propuesta dentro de ${limite} s`,
       ok: Boolean(video && video.duracionSegundos <= limite),
+    },
+    {
+      label:
+        faltantes.length === 0
+          ? "Expediente completo: los cinco documentos oficiales"
+          : `Faltan documentos del expediente: ${faltantes.map((d) => d.nombre).join(", ")}`,
+      ok: faltantes.length === 0,
     },
     {
       // No se puede automatizar: exige leer el PDF y compararlo con lo

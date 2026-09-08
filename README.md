@@ -97,7 +97,7 @@ El navegador sube directo a S3, así que el bucket necesita permitir `POST` desd
 | `/aplicacion/revision` | aplicante | Paso 3, checklist y envío |
 | `/resultado` | aplicante | Dictamen, puntaje por criterio, retroalimentación |
 | `/confirmacion` | aplicante | Confirmar o declinar el lugar |
-| `/expediente` | aplicante | Etapa final, bloqueada hasta la publicación de resultados |
+| `/expediente` | aplicante | Documentos oficiales; se habilita al enviar y cierra con la convocatoria |
 | `/aplicaciones` | ANUIES | Lista con filtros, paginación y CSV |
 | `/aplicaciones/:id` | ANUIES | Detalle completo, sin IA ni captura |
 | `/admin` | admin | KPIs, avance, ejecutar IA, publicar resultados |
@@ -110,7 +110,9 @@ El navegador sube directo a S3, así que el bucket necesita permitir `POST` desd
 
 La postulación son **tres pasos**: datos, videos y envío. No se piden documentos para postular.
 
-Los **cinco documentos oficiales se integran después**, en `/expediente`, y solo los entregan las aplicantes que recibieron dictamen favorable. La etapa aparece bloqueada en el tablero desde el principio —con la lista a la vista, para que nadie se lleve una sorpresa— y se habilita al publicar resultados. Pedir cinco constancias por adelantado a cientos de estudiantes, cuando la mayoría no será seleccionada, carga de trámites a quienes no los van a necesitar y a las áreas escolares que los emiten.
+Los **cinco documentos oficiales se entregan después de enviar**, en `/expediente`, con fecha límite el cierre de la convocatoria. Enviar los videos ya deja a la aplicante participando; los documentos son el respaldo que el comité necesita para verificar la elegibilidad, y la evaluación arranca al día siguiente del cierre.
+
+El orden importa y la interfaz lo dice con todas sus letras: al enviar, el tablero encabeza con «Ya estás participando» y, si faltan documentos, con cuántos y hasta cuándo. Antes de enviar, `/expediente` no está vacío: muestra la lista para que se vayan reuniendo, porque algunos los emite la universidad y tardan.
 
 Los dos videos son obligatorios y evalúan cosas distintas, así que se piden en este orden:
 

@@ -32,9 +32,10 @@ export function confirmacionAbierta(e: Edicion, ahora = new Date()) {
 
 /** Ventana de integración del expediente.
  *
- *  Abre al publicar resultados y cierra cuando arranca el programa: los
- *  documentos oficiales solo se le piden a quien ya fue seleccionada, y deben
- *  estar completos antes de que la aplicante viaje a Valle de Bravo. */
+ *  Se habilita al enviar la postulación y cierra con la convocatoria: quien
+ *  mandó su video ya está participando, y los documentos oficiales tienen que
+ *  estar completos antes del cierre, porque la evaluación empieza al día
+ *  siguiente y el comité los necesita para verificar la elegibilidad. */
 export function expedienteAbierto(e: Edicion, ahora = new Date()) {
-  return resultadosPublicados(e, ahora) && ahora <= e.eventoInicia;
+  return ahora <= e.cierreRecepcion;
 }

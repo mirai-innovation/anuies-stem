@@ -36,23 +36,19 @@ async function borradorEditable() {
   return { usuario, app };
 }
 
-/** Guarda del expediente. Es otra ventana y otro requisito que la del
- *  borrador: aquí la aplicación ya se envió, ya se evaluó y el dictamen fue
- *  favorable. */
+/** Guarda del expediente. Es otra ventana que la del borrador: se abre cuando
+ *  la postulación ya se envió y se cierra con la convocatoria. */
 async function expedienteEditable() {
   const usuario = await exigeRol("applicant");
   const edicion = await edicionActual();
 
   const app = await db.application.findUnique({ where: { userId: usuario.id } });
   if (!app) throw new Error("No existe una aplicación para esta cuenta.");
-  if (app.dictamen !== "selected") {
-    throw new Error("El expediente solo lo integran las aplicantes seleccionadas.");
+  if (app.estado === "draft") {
+    throw new Error("El expediente se habilita cuando envías tu postulación.");
   }
   if (!expedienteAbierto(edicion)) {
-    throw new Error("La integración de expedientes no está abierta.");
-  }
-  if (app.confirmacion?.estado === "declinada") {
-    throw new Error("Declinaste tu lugar, así que no hay expediente que integrar.");
+    throw new Error("La entrega de documentos cerró junto con la convocatoria.");
   }
   return { usuario, app };
 }
