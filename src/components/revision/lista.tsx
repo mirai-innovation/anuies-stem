@@ -23,7 +23,7 @@ export async function ListaAplicaciones({
   const [{ total, filas, pagina, paginas }, kpis, universidades] = await Promise.all([
     consultarAplicaciones(filtros, esAdmin),
     kpisLista(),
-    db.universidad.findMany({ orderBy: { nombre: "asc" }, select: { id: true, siglas: true, nombre: true } }),
+    db.universidad.findMany({ orderBy: { nombre: "asc" }, select: { id: true, siglas: true, nombre: true, estado: true } }),
   ]);
 
   const tarjetas = [

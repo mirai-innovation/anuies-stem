@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ESTADOS, TECNOLOGIAS } from "@/lib/constantes";
 import type { FiltrosLista } from "@/lib/lista";
 import { Entrada, Seleccion } from "@/components/ui";
@@ -16,11 +16,27 @@ export function Filtros({
 }: {
   base: string;
   filtros: FiltrosLista;
-  universidades: { id: string; siglas: string; nombre: string }[];
+  universidades: { id: string; siglas: string; nombre: string; estado: string }[];
   /** Administración puede filtrar por borradores; el comité no los ve. */
   incluirBorradores?: boolean;
 }) {
   const router = useRouter();
+
+  // Se agrupan por entidad y se ordenan dentro de cada una por nombre.
+  const porEstado = useMemo(() => {
+    const mapa = new Map<string, typeof universidades>();
+    for (const u of universidades) {
+      const lista = mapa.get(u.estado) ?? [];
+      lista.push(u);
+      mapa.set(u.estado, lista);
+    }
+    return [...mapa.entries()]
+      .sort(([a], [b]) => a.localeCompare(b, "es"))
+      .map(
+        ([estado, lista]) =>
+          [estado, [...lista].sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))] as const,
+      );
+  }, [universidades]);
   const [q, setQ] = useState(filtros.q ?? "");
 
   function navegar(cambios: Partial<FiltrosLista>) {
@@ -90,10 +106,17 @@ export function Filtros({
         className="w-auto! py-2.5"
       >
         <option value="todas">Todas las universidades</option>
-        {universidades.map((u) => (
-          <option key={u.id} value={u.id}>
-            {u.siglas}
-          </option>
+        {/* Agrupadas por entidad: son 145 y en una lista plana no hay forma de
+            encontrar una. El nombre completo acompaña a las siglas porque
+            "UTCH Sur" o "EN 3 Toluca" no le dicen nada a quien revisa. */}
+        {porEstado.map(([estado, lista]) => (
+          <optgroup key={estado} label={estado}>
+            {lista.map((u) => (
+              <option key={u.id} value={u.id}>
+                {u.siglas} — {u.nombre}
+              </option>
+            ))}
+          </optgroup>
         ))}
       </Seleccion>
 
