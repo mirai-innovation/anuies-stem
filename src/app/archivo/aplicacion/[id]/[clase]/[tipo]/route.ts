@@ -33,8 +33,9 @@ export async function GET(
   const app = await db.application.findUnique({ where: { id } });
   if (!app) return NextResponse.json({ error: "Aplicación no encontrada" }, { status: 404 });
 
-  // Un borrador no enviado no es consultable por el comité.
-  if (app.estado === "draft") {
+  // Un borrador no enviado no es consultable por el comité; administración sí
+  // puede abrirlo para seguir el avance durante la convocatoria.
+  if (app.estado === "draft" && usuario.rol !== "admin") {
     return NextResponse.json({ error: "La aplicación no ha sido enviada" }, { status: 404 });
   }
 

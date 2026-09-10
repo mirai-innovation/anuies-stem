@@ -12,10 +12,13 @@ export function Filtros({
   base,
   filtros,
   universidades,
+  incluirBorradores = false,
 }: {
   base: string;
   filtros: FiltrosLista;
   universidades: { id: string; siglas: string; nombre: string }[];
+  /** Administración puede filtrar por borradores; el comité no los ve. */
+  incluirBorradores?: boolean;
 }) {
   const router = useRouter();
   const [q, setQ] = useState(filtros.q ?? "");
@@ -59,13 +62,22 @@ export function Filtros({
         className="w-auto! py-2.5"
       >
         <option value="todos">Todos los estados</option>
-        {(["submitted", "in_review", "evaluated", "selected", "waitlist", "rejected"] as const).map(
-          (e) => (
-            <option key={e} value={e}>
-              {ESTADOS[e]}
-            </option>
-          ),
-        )}
+        {(
+          [
+            // El borrador solo se ofrece a quien puede verlos.
+            ...(incluirBorradores ? (["draft"] as const) : []),
+            "submitted",
+            "in_review",
+            "evaluated",
+            "selected",
+            "waitlist",
+            "rejected",
+          ] as const
+        ).map((e) => (
+          <option key={e} value={e}>
+            {ESTADOS[e]}
+          </option>
+        ))}
       </Seleccion>
 
       <label htmlFor="f-uni" className="sr-only">

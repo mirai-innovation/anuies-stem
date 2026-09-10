@@ -10,6 +10,7 @@ import {
   ESTADOS,
   NIVELES,
   TECNOLOGIAS,
+  VIDEOS,
 } from "@/lib/constantes";
 import { duracion, fechaCorta, pesoArchivo } from "@/lib/fechas";
 import { Aviso, Chip, Etiqueta, Tarjeta, Titulo } from "@/components/ui";
@@ -49,8 +50,11 @@ export async function DetalleAplicacion({
     },
   });
 
-  if (!app || app.estado === "draft") notFound();
+  // El comité no ve lo que no se envió; administración sí, para seguir el
+  // avance mientras la convocatoria está abierta.
+  if (!app || (app.estado === "draft" && !esAdmin)) notFound();
 
+  const esBorrador = app.estado === "draft";
   const video = app.videos.find((v) => v.tipo === "propuesta");
   const entregados = new Map(app.documentos.map((d) => [d.tipo, d]));
   const mia = app.evaluaciones.find((e) => e.evaluatorId === usuarioId);
@@ -79,6 +83,16 @@ export async function DetalleAplicacion({
         ← Todas las aplicaciones
       </Link>
 
+      {esBorrador && (
+        <div className="mb-4 max-w-[74ch]">
+          <Aviso tono="info">
+            <strong>Borrador · aún no se envía.</strong> La aplicante todavía puede cambiar
+            cualquier cosa, así que lo que ves aquí es un avance, no una postulación. No se puede
+            evaluar hasta que la envíe.
+          </Aviso>
+        </div>
+      )}
+
       {!app.universidadId && app.academicos?.universidad && (
         <div className="mb-4 max-w-[70ch]">
           <Aviso tono="info">
@@ -91,7 +105,10 @@ export async function DetalleAplicacion({
       <div className="mb-6 flex flex-wrap items-end justify-between gap-5">
         <div>
           <div className="font-mono text-[11px] tracking-[0.08em] text-gris">
-            {app.folio} · enviada {fechaCorta(app.enviadaEn)}
+            {app.folio} ·{" "}
+            {app.enviadaEn
+              ? `enviada ${fechaCorta(app.enviadaEn)}`
+              : `sin enviar · última edición ${fechaCorta(app.actualizadaEn)}`}
           </div>
           <Titulo className="mb-1 mt-1.5 text-[38px]">
             {app.datos?.nombreCompleto ?? "Sin nombre"}
@@ -127,30 +144,44 @@ export async function DetalleAplicacion({
 
       <div className="grid items-start gap-6 lg:grid-cols-2">
         <div className="grid gap-6">
-          <Tarjeta>
-            <Etiqueta className="mb-4">
-              Video de propuesta{video ? ` · ${duracion(video.duracionSegundos)}` : ""}
-            </Etiqueta>
-            {video ? (
-              // La fuente apunta a la ruta autorizada, que firma la URL en el
-              // momento: así el enlace del reproductor no sobrevive a la sesión.
-              <video
-                controls
-                preload="metadata"
-                className="aspect-video w-full bg-tinta"
-                src={`/archivo/aplicacion/${app.id}/video/propuesta`}
-              />
-            ) : (
-              <div className="grid aspect-video w-full place-items-center bg-tinta">
-                <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-gris-claro">
-                  Sin video de propuesta
-                </span>
-              </div>
-            )}
+          {/* Los dos videos, en el orden en que se piden: el de presentación
+              habla de la aplicante y el de propuesta, del proyecto. */}
+          {VIDEOS.map((regla) => {
+            const subido = app.videos.find((v) => v.tipo === regla.tipo);
+            return (
+              <Tarjeta key={regla.tipo}>
+                <Etiqueta className="mb-4">
+                  {regla.nombre}
+                  {subido ? ` · ${duracion(subido.duracionSegundos)}` : ""}
+                </Etiqueta>
+                {subido ? (
+                  // La fuente apunta a la ruta autorizada, que firma la URL en
+                  // el momento: así el enlace del reproductor no sobrevive a la
+                  // sesión.
+                  <video
+                    controls
+                    preload="metadata"
+                    className="aspect-video w-full bg-tinta"
+                    src={`/archivo/aplicacion/${app.id}/video/${regla.tipo}`}
+                  />
+                ) : (
+                  <div className="grid aspect-video w-full place-items-center bg-tinta">
+                    <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-gris-claro">
+                      Sin {regla.nombre.toLowerCase()}
+                    </span>
+                  </div>
+                )}
+                {subido?.resumen && (
+                  <p className="mt-3 text-[13px] leading-relaxed text-gris">{subido.resumen}</p>
+                )}
+              </Tarjeta>
+            );
+          })}
 
-            <div className="mt-3.5 text-sm">
+          <Tarjeta>
+            <Etiqueta className="mb-4">Propuesta</Etiqueta>
+            <div className="text-sm">
               <strong>{app.propuesta?.nombre ?? "Sin nombre"}</strong>
-              {video?.resumen ? ` · ${video.resumen}` : ""}
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
               {app.propuesta?.tecnologia && <Chip>{TECNOLOGIAS[app.propuesta.tecnologia]}</Chip>}
@@ -251,7 +282,16 @@ export async function DetalleAplicacion({
             </div>
           </Tarjeta>
 
-          {esAdmin ? (
+          {esAdmin && esBorrador ? (
+            <Tarjeta tono="teal">
+              <Etiqueta className="mb-3 text-teal-oscuro">Evaluación no disponible</Etiqueta>
+              <p className="text-[13px] leading-relaxed text-tinta">
+                Esta aplicación sigue en borrador. El formulario de evaluación se habilita cuando
+                la aplicante la envíe: calificar un avance sería calificar algo que todavía va a
+                cambiar.
+              </p>
+            </Tarjeta>
+          ) : esAdmin ? (
             <FormularioEvaluacion
               applicationId={app.id}
               criterios={CRITERIOS.map((c) => ({ clave: c.clave, nombre: c.nombre }))}

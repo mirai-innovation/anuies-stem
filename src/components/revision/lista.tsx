@@ -21,13 +21,23 @@ export async function ListaAplicaciones({
 }) {
   const esAdmin = rol === "admin";
   const [{ total, filas, pagina, paginas }, kpis, universidades] = await Promise.all([
-    consultarAplicaciones(filtros),
+    consultarAplicaciones(filtros, esAdmin),
     kpisLista(),
     db.universidad.findMany({ orderBy: { nombre: "asc" }, select: { id: true, siglas: true, nombre: true } }),
   ]);
 
   const tarjetas = [
     { label: "Recibidas", value: String(kpis.recibidas), note: "Aplicaciones enviadas" },
+    // Solo administración ve el avance de lo que aún no se envía.
+    ...(esAdmin
+      ? [
+          {
+            label: "En progreso",
+            value: String(kpis.enProgreso),
+            note: "Borradores sin enviar",
+          },
+        ]
+      : []),
     { label: "Evaluadas", value: String(kpis.evaluadas), note: `${kpis.recibidas - kpis.evaluadas} pendientes` },
     { label: "Seleccionadas", value: String(kpis.seleccionadas), note: "Dictamen favorable" },
     {
@@ -72,7 +82,12 @@ export async function ListaAplicaciones({
       </div>
 
       <div className="border border-linea bg-superficie">
-        <Filtros base={base} filtros={filtros} universidades={universidades} />
+        <Filtros
+          base={base}
+          filtros={filtros}
+          universidades={universidades}
+          incluirBorradores={esAdmin}
+        />
 
         {filas.length === 0 ? (
           <div className="p-6">

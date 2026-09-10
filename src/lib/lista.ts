@@ -13,10 +13,15 @@ export type FiltrosLista = {
 
 /** Construye el filtro de la lista de revisión.
  *
- *  Los borradores nunca aparecen: una aplicación que no se envió no existe
- *  para el comité, aunque tenga folio asignado. */
-export function condiciones(f: FiltrosLista): Prisma.ApplicationWhereInput {
-  const donde: Prisma.ApplicationWhereInput = { estado: { not: "draft" } };
+ *  Para el comité, una aplicación que no se envió no existe. Administración sí
+ *  las ve: durante la convocatoria abierta necesita saber cuántas están a
+ *  medias y qué les falta, que es distinto de evaluarlas —eso sigue vedado
+ *  hasta el envío. */
+export function condiciones(
+  f: FiltrosLista,
+  incluirBorradores = false,
+): Prisma.ApplicationWhereInput {
+  const donde: Prisma.ApplicationWhereInput = incluirBorradores ? {} : { estado: { not: "draft" } };
   const y: Prisma.ApplicationWhereInput[] = [];
 
   if (f.estado && f.estado !== "todos") {
@@ -51,8 +56,8 @@ export const INCLUIR = {
   evaluacionIA: { select: { estado: true, scoreGlobal: true } },
 } satisfies Prisma.ApplicationInclude;
 
-export async function consultarAplicaciones(f: FiltrosLista) {
-  const donde = condiciones(f);
+export async function consultarAplicaciones(f: FiltrosLista, incluirBorradores = false) {
+  const donde = condiciones(f, incluirBorradores);
   const pagina = Math.max(1, Number(f.pagina ?? 1) || 1);
 
   const [total, filas] = await Promise.all([
@@ -60,7 +65,10 @@ export async function consultarAplicaciones(f: FiltrosLista) {
     db.application.findMany({
       where: donde,
       include: INCLUIR,
-      orderBy: [{ puntajeComite: "desc" }, { enviadaEn: "asc" }],
+      // Las evaluadas primero por puntaje; las enviadas por antigüedad; los
+      // borradores, que no tienen ninguna de las dos, por actividad reciente,
+      // que es lo único que dice algo de ellos.
+      orderBy: [{ puntajeComite: "desc" }, { enviadaEn: "asc" }, { actualizadaEn: "desc" }],
       skip: (pagina - 1) * POR_PAGINA,
       take: POR_PAGINA,
     }),
@@ -71,8 +79,9 @@ export async function consultarAplicaciones(f: FiltrosLista) {
 
 /** KPIs de la cabecera de la lista. */
 export async function kpisLista() {
-  const [recibidas, evaluadas, seleccionadas, promedio] = await Promise.all([
+  const [recibidas, enProgreso, evaluadas, seleccionadas, promedio] = await Promise.all([
     db.application.count({ where: { estado: { not: "draft" } } }),
+    db.application.count({ where: { estado: "draft" } }),
     db.application.count({ where: { estado: { in: ["evaluated", "selected", "waitlist", "rejected"] } } }),
     db.application.count({ where: { dictamen: "selected" } }),
     db.application.aggregate({
@@ -83,6 +92,7 @@ export async function kpisLista() {
 
   return {
     recibidas,
+    enProgreso,
     evaluadas,
     seleccionadas,
     promedio: promedio._avg.puntajeComite,
