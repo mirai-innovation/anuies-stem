@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { diasPara, fecha } from "./fechas";
 
 /** Correos de la convocatoria.
  *
@@ -163,4 +164,79 @@ export function correoRecordatorioConfirmacion(
       { texto: "Confirmar mi participación", url: `${BASE}/confirmacion` },
     ),
   );
+}
+
+/** Lo que escribe la aplicante (su nombre) viaja dentro del HTML del correo. */
+function escapar(texto: string) {
+  return texto
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function quedan(dias: number) {
+  if (dias <= 0) return "cierra hoy";
+  if (dias === 1) return "queda 1 día";
+  return `quedan ${dias} días`;
+}
+
+/** Recordatorio de cierre de recepción.
+ *
+ *  Se separa el contenido del envío para que el panel pueda mostrar la vista
+ *  previa exacta y mandar la prueba con el mismo HTML que recibirán las
+ *  aplicantes. `faltantes` en null significa que aún no inicia su aplicación. */
+export function recordatorioCierre(opts: {
+  nombre: string;
+  cierre: Date;
+  faltantes: string[] | null;
+  prueba?: boolean;
+  ahora?: Date;
+}) {
+  const dia = fecha(opts.cierre, "EEEE d 'de' MMMM");
+  const hora = fecha(opts.cierre, "HH:mm");
+  const restante = quedan(diasPara(opts.cierre, opts.ahora));
+  const sinIniciar = opts.faltantes === null;
+
+  const intro = sinIniciar
+    ? "<p>Creaste tu cuenta en el Reto ANUIES4MX 2026, pero todavía no empiezas tu aplicación.</p>"
+    : "<p>Tu aplicación al Reto ANUIES4MX 2026 todavía no está enviada.</p>";
+
+  const lista =
+    opts.faltantes && opts.faltantes.length > 0
+      ? `<p style="margin-bottom:6px"><strong>Lo que te falta:</strong></p>
+         <ul style="margin:0 0 16px;padding-left:20px">${opts.faltantes
+           .map((f) => `<li style="margin-bottom:4px">${escapar(f)}</li>`)
+           .join("")}</ul>`
+      : "";
+
+  const cierre = sinIniciar
+    ? "<p>El registro toma unos minutos por paso y tu avance se guarda solo, así que puedes hacerlo en varias sesiones.</p>"
+    : "<p>Tu avance está guardado: entra y continúa donde te quedaste. Recuerda que la aplicación solo cuenta cuando presionas <strong>Enviar</strong> en el último paso.</p>";
+
+  const aviso = opts.prueba
+    ? `<p style="background:#FBF5F8;border:1px dashed #D6336C;padding:10px 12px;font-size:12px;color:#8A1F49;margin:0 0 18px">Correo de prueba enviado desde el panel de administración. Las aplicantes no reciben este aviso.</p>`
+    : "";
+
+  return {
+    asunto: `${opts.prueba ? "[PRUEBA] " : ""}La recepción cierra el ${fecha(opts.cierre, "d 'de' MMMM")} · Reto ANUIES4MX 2026`,
+    html: plantilla(
+      `Tu aplicación cierra pronto`,
+      `${aviso}<p>Hola ${escapar(opts.nombre)}:</p>${intro}
+       <p>La recepción cierra el <strong>${dia} a las ${hora} h</strong> (hora del centro de México): ${restante}. Después de esa hora la plataforma ya no acepta envíos.</p>
+       ${lista}${cierre}`,
+      {
+        texto: sinIniciar ? "Empezar mi aplicación" : "Terminar mi aplicación",
+        url: `${BASE}/dashboard`,
+      },
+    ),
+  };
+}
+
+export function correoRecordatorioCierre(
+  para: string,
+  opts: Parameters<typeof recordatorioCierre>[0],
+) {
+  const { asunto, html } = recordatorioCierre(opts);
+  return enviar(para, asunto, html);
 }

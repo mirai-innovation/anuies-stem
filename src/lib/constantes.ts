@@ -241,3 +241,8 @@ export function etiquetaPaso(slug: (typeof PASOS)[number]["slug"]) {
   const i = PASOS.findIndex((p) => p.slug === slug);
   return `Aplicación · paso ${i + 1} de ${PASOS.length}`;
 }
+
+/** Correos por llamada del envío masivo de recordatorios. Lote pequeño: cada
+ *  llamada termina mucho antes del límite de tiempo de una función en Vercel,
+ *  y el panel puede mostrar el avance. */
+export const TAMANO_LOTE = 10;
