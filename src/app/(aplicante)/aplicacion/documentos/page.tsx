@@ -30,6 +30,7 @@ export default async function PasoDocumentos() {
             tipo: d.tipo,
             nombre: d.nombre,
             ayuda: d.ayuda,
+            formato: d.formato ?? null,
             subido: sub
               ? {
                   nombreOriginal: sub.nombreOriginal,

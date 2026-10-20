@@ -14,6 +14,7 @@ type Fila = {
   tipo: TipoDocumento;
   nombre: string;
   ayuda: string;
+  formato: string | null;
   subido: { nombreOriginal: string; tamanoBytes: number; subidoEn: string } | null;
 };
 
@@ -37,6 +38,16 @@ function FilaDocumento({ fila }: { fila: Fila }) {
             <Chip tono={fila.subido ? "teal" : "rosa"}>{fila.subido ? "Cargado" : "Falta"}</Chip>
           </div>
           <p className="mt-1 text-[12.5px] text-gris">{fila.ayuda}</p>
+          {fila.formato && (
+            <a
+              href={fila.formato}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1.5 inline-block font-mono text-[11px] uppercase tracking-[0.06em]"
+            >
+              Abrir formato oficial ↗
+            </a>
+          )}
           {fila.subido && (
             <p className="mt-1.5 font-mono text-[11px] text-gris">
               {fila.subido.nombreOriginal} · {pesoArchivo(fila.subido.tamanoBytes)}

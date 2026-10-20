@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { diasPara, fecha } from "./fechas";
+import { FORMATO_CARTA_COMPROMISO } from "./constantes";
 
 /** Correos de la convocatoria.
  *
@@ -210,6 +211,8 @@ export function recordatorioCierre(opts: {
            .join("")}</ul>`
       : "";
 
+  const formato = `<p style="background:#FBF5F8;border-left:3px solid #D6336C;padding:10px 14px;margin:0 0 16px">La <strong>carta compromiso</strong> debe llenarse en el formato oficial: <a href="${FORMATO_CARTA_COMPROMISO}" style="color:#8A1F49">abrir formato de carta compromiso</a>. Descárgalo, llénalo, fírmalo y súbelo en PDF en el paso de Documentos.</p>`;
+
   const cierre = sinIniciar
     ? "<p>El registro toma unos minutos por paso y tu avance se guarda solo, así que puedes hacerlo en varias sesiones.</p>"
     : "<p>Tu avance está guardado: entra y continúa donde te quedaste. Recuerda que la aplicación solo cuenta cuando presionas <strong>Enviar</strong> en el último paso.</p>";
@@ -224,7 +227,7 @@ export function recordatorioCierre(opts: {
       `Tu aplicación cierra pronto`,
       `${aviso}<p>Hola ${escapar(opts.nombre)}:</p>${intro}
        <p>La recepción cierra el <strong>${dia} a las ${hora} h</strong> (hora del centro de México): ${restante}. Después de esa hora la plataforma ya no acepta envíos.</p>
-       ${lista}${cierre}`,
+       ${lista}${formato}${cierre}`,
       {
         texto: sinIniciar ? "Empezar mi aplicación" : "Terminar mi aplicación",
         url: `${BASE}/dashboard`,

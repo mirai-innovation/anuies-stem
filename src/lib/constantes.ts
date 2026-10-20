@@ -102,9 +102,20 @@ export const DICTAMENES: Record<Dictamen, string> = {
   rejected: "No seleccionada",
 };
 
+/** Formato oficial de la carta compromiso (Google Docs). El documento debe
+ *  estar compartido como "cualquier persona con el enlace puede ver". */
+export const FORMATO_CARTA_COMPROMISO =
+  "https://docs.google.com/document/d/18nmGqSg009DZuwHXuNMbFy4-lf_8h4HZXGRhRoz_xsE/edit";
+
 /** Los cinco documentos oficiales. Son obligatorios para poder enviar la
- *  postulación y se capturan en el paso 3. */
-export const DOCUMENTOS: { tipo: TipoDocumento; nombre: string; ayuda: string }[] = [
+ *  postulación y se capturan en el paso 3. `formato` es la plantilla que la
+ *  aplicante debe usar, cuando la convocatoria da una. */
+export const DOCUMENTOS: {
+  tipo: TipoDocumento;
+  nombre: string;
+  ayuda: string;
+  formato?: string;
+}[] = [
   {
     tipo: "constancia_inscripcion",
     nombre: "Constancia de inscripción",
@@ -119,6 +130,7 @@ export const DOCUMENTOS: { tipo: TipoDocumento; nombre: string; ayuda: string }[
     tipo: "carta_compromiso",
     nombre: "Carta compromiso",
     ayuda: "En el formato ANUIES, firmada por ti.",
+    formato: FORMATO_CARTA_COMPROMISO,
   },
   {
     tipo: "carta_respaldo",
