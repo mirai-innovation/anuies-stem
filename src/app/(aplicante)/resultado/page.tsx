@@ -60,12 +60,12 @@ export default async function Resultado() {
 
   // A la aplicante solo se le muestra el dictamen: ni puntaje, ni calificación
   // por criterio, ni retroalimentación del comité.
-  const dictamen = app.dictamen;
+  // "Lista de espera" es solo interna del comité: la aplicante en espera ve
+  // "No seleccionada", igual que una rechazada.
+  const dictamen = app.dictamen === "waitlist" ? "rejected" : app.dictamen;
 
-  const mensajePorDictamen: Record<string, string> = {
+  const mensajePorDictamen: Record<"selected" | "rejected", string> = {
     selected: `Tu propuesta fue elegida para el Reto ANUIES4MX en Valle de Bravo, ${fechaCorta(edicion.eventoInicia)} — ${fechaCorta(edicion.eventoTermina)}. Confirma tu participación antes del ${fecha(edicion.confirmacionCierra, "d 'de' MMMM")}.`,
-    waitlist:
-      "Tu propuesta quedó en lista de espera. Si se libera un lugar, la coordinación te contactará por este medio.",
     rejected:
       "En esta edición tu propuesta no fue seleccionada. Gracias por participar en el Reto ANUIES4MX.",
   };
