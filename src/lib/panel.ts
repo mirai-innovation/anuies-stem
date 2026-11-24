@@ -13,7 +13,7 @@ export async function datosPanel() {
     iaPendiente,
     iaError,
     seleccionadas,
-    listaEspera,
+    noSeleccionadas,
     confirmadas,
     promedio,
     conteosTecnologia,
@@ -27,7 +27,7 @@ export async function datosPanel() {
     db.aiEvaluation.count({ where: { estado: "pending" } }),
     db.aiEvaluation.count({ where: { estado: "error" } }),
     db.application.count({ where: { dictamen: "selected" } }),
-    db.application.count({ where: { dictamen: "waitlist" } }),
+    db.application.count({ where: { dictamen: "rejected" } }),
     db.application.count({ where: { confirmacion: { is: { estado: "confirmada" } } } }),
     db.application.aggregate({
       where: { puntajeComite: { not: null } },
@@ -55,7 +55,7 @@ export async function datosPanel() {
     iaPendiente,
     iaError,
     seleccionadas,
-    listaEspera,
+    noSeleccionadas,
     confirmadas,
     promedio: promedio._avg.puntajeComite,
     tecnologias: conteosTecnologia.map((c) => ({

@@ -86,7 +86,6 @@ export function Filtros({
             "in_review",
             "evaluated",
             "selected",
-            "waitlist",
             "rejected",
           ] as const
         ).map((e) => (

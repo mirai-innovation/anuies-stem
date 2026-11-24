@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import type { Dictamen } from "@prisma/client";
 import { AreaTexto, Aviso, Boton, Etiqueta, Tarjeta } from "@/components/ui";
-import { DICTAMENES } from "@/lib/constantes";
+import { DICTAMENES, DICTAMENES_DISPONIBLES } from "@/lib/constantes";
 import { guardarEvaluacion, type EstadoEvaluacion } from "@/app/admin/acciones";
 
 const VACIO: EstadoEvaluacion = {};
@@ -146,7 +146,7 @@ export function FormularioEvaluacion({
             Dictamen
           </legend>
           <div className="flex flex-wrap gap-2.5">
-            {(Object.keys(DICTAMENES) as Dictamen[]).map((d) => {
+            {DICTAMENES_DISPONIBLES.map((d) => {
               const activo = dictamen === d;
               return (
                 <label
