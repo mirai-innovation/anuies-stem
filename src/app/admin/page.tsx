@@ -20,7 +20,7 @@ export default async function Panel() {
       value: String(d.evaluadas),
       note: `${d.recibidas - d.evaluadas} pendientes`,
     },
-    { label: "Seleccionadas", value: String(d.seleccionadas), note: `${d.noSeleccionadas} no seleccionadas` },
+    { label: "Seleccionadas", value: String(d.seleccionadas), note: `${d.listaEspera} en espera` },
     {
       label: "Promedio comité",
       value: d.promedio ? d.promedio.toFixed(2) : "—",
@@ -42,8 +42,8 @@ export default async function Panel() {
     },
     {
       label: "Dictámenes emitidos",
-      valor: d.recibidas ? (d.seleccionadas + d.noSeleccionadas) / d.recibidas : 0,
-      texto: `${d.seleccionadas + d.noSeleccionadas} / ${d.recibidas}`,
+      valor: d.recibidas ? (d.seleccionadas + d.listaEspera) / d.recibidas : 0,
+      texto: `${d.seleccionadas + d.listaEspera} / ${d.recibidas}`,
     },
     {
       label: "Confirmaciones",

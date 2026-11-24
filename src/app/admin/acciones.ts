@@ -22,7 +22,7 @@ const Esquema = z.object({
   presentacion: z.coerce.number().int().min(1).max(5),
   fortalezas: z.string().trim().min(1).max(2000),
   areasOportunidad: z.string().trim().min(1).max(2000),
-  dictamen: z.enum(["selected", "rejected"]),
+  dictamen: z.enum(["selected", "waitlist", "rejected"]),
 });
 
 /** Recalcula el puntaje del comité y el promedio por criterio a partir de

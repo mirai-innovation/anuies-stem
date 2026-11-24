@@ -102,11 +102,6 @@ export const DICTAMENES: Record<Dictamen, string> = {
   rejected: "No seleccionada",
 };
 
-/** Dictámenes que el comité puede emitir. "Lista de espera" ya no se ofrece:
- *  el resultado es seleccionada o no seleccionada. El valor sigue en el
- *  esquema solo para no romper registros antiguos. */
-export const DICTAMENES_DISPONIBLES = ["selected", "rejected"] as const satisfies readonly Dictamen[];
-
 /** Formato oficial de la carta compromiso (Google Docs). El documento debe
  *  estar compartido como "cualquier persona con el enlace puede ver". */
 export const FORMATO_CARTA_COMPROMISO =
