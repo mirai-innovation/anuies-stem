@@ -139,16 +139,22 @@ export function correoEnvioRecibido(para: string, nombre: string, folio: string,
   );
 }
 
-export function correoResultados(para: string, nombre: string, folio: string) {
-  return enviar(
-    para,
-    `Ya puedes consultar tu resultado · ${folio}`,
-    plantilla(
+/** Asunto y cuerpo del aviso de resultados. Separado del envío para que el
+ *  panel de admin pueda mostrar exactamente el mismo correo antes de publicar. */
+export function contenidoCorreoResultados(nombre: string, folio: string) {
+  return {
+    asunto: `Ya puedes consultar tu resultado · ${folio}`,
+    html: plantilla(
       "Resultados publicados",
-      `<p>Hola ${nombre}:</p><p>El comité publicó los dictámenes de la convocatoria. Entra a la plataforma para ver tu puntaje por criterio y la retroalimentación.</p>`,
+      `<p>Hola ${nombre}:</p><p>El comité publicó los dictámenes de la convocatoria. Entra a la plataforma para consultar tu dictamen.</p>`,
       { texto: "Ver mi resultado", url: `${BASE}/resultado` },
     ),
-  );
+  };
+}
+
+export function correoResultados(para: string, nombre: string, folio: string) {
+  const { asunto, html } = contenidoCorreoResultados(nombre, folio);
+  return enviar(para, asunto, html);
 }
 
 export function correoRecordatorioConfirmacion(

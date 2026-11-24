@@ -46,8 +46,8 @@ export default async function Confirmacion() {
     return envoltura(
       <Tarjeta>
         <p className="max-w-[62ch] text-sm leading-relaxed text-gris">
-          Esta sección es solo para las aplicantes seleccionadas. Puedes consultar tu dictamen y la
-          retroalimentación del comité en tu resultado.
+          Esta sección es solo para las aplicantes seleccionadas. Puedes consultar tu dictamen en tu
+          resultado.
         </p>
         <BotonEnlace href="/resultado" variante="secundario" className="mt-5">
           Ver mi resultado

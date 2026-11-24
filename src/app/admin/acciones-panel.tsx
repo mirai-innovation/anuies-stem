@@ -65,8 +65,17 @@ export function AccionesPanel({
           (confirmando ? (
             <div className="flex flex-wrap items-center gap-2.5 border border-rosa px-3.5 py-2">
               <span className="text-[12.5px] text-tinta">
-                Las aplicantes verán su dictamen y las evaluaciones quedarán firmes.
+                Las aplicantes verán su dictamen, recibirán un correo y las evaluaciones
+                quedarán firmes.
               </span>
+              <a
+                href="/admin/vista-correo"
+                target="_blank"
+                rel="noopener"
+                className="font-mono text-[11px] uppercase tracking-[0.08em] text-rosa underline"
+              >
+                Ver correo
+              </a>
               <Boton
                 type="button"
                 disabled={pendiente}
@@ -98,6 +107,17 @@ export function AccionesPanel({
             </Boton>
           ))}
       </div>
+
+      {!publicados && (
+        <a
+          href="/admin/vista-correo"
+          target="_blank"
+          rel="noopener"
+          className="w-fit font-mono text-[11px] uppercase tracking-[0.08em] text-gris underline"
+        >
+          Vista previa del correo de resultados ↗
+        </a>
+      )}
 
       {!publicados && sinEvaluar > 0 && (
         <p className="font-mono text-[10.5px] text-gris">
