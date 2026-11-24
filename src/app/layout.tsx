@@ -1,14 +1,21 @@
 import type { Metadata } from "next";
-import { Big_Shoulders, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import localFont from "next/font/local";
+import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 
-// Google renombro la familia: lo que el diseno pide como "Big Shoulders
-// Display" hoy se sirve como "Big Shoulders". Es la misma tipografia.
-const titulo = Big_Shoulders({
-  subsets: ["latin"],
-  weight: ["500", "700", "800"],
+// Big Shoulders (antes "Big Shoulders Display") se sirve desde el repo y no
+// desde Google: Google entrega sus archivos con URLs sin extensión y
+// next/font/google truena en el build ("Cannot read properties of null").
+// Archivos tomados de @fontsource/big-shoulders, licencia OFL.
+const titulo = localFont({
+  src: [
+    { path: "./fuentes/big-shoulders-latin-500-normal.woff2", weight: "500", style: "normal" },
+    { path: "./fuentes/big-shoulders-latin-700-normal.woff2", weight: "700", style: "normal" },
+    { path: "./fuentes/big-shoulders-latin-800-normal.woff2", weight: "800", style: "normal" },
+  ],
   variable: "--fuente-titulo",
   display: "swap",
+  fallback: ["Arial Narrow", "sans-serif"],
 });
 
 const texto = IBM_Plex_Sans({
