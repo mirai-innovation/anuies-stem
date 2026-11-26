@@ -19,6 +19,7 @@ export const NAVEGACION: Record<Rol, { href: string; label: string }[]> = {
     { href: "/admin", label: "Panel general" },
     { href: "/admin/aplicaciones", label: "Aplicaciones" },
     { href: "/admin/recordatorios", label: "Recordatorios" },
+    { href: "/admin/confirmaciones", label: "Confirmaciones" },
     { href: "/admin/equipos", label: "Equipos Demo Day" },
     { href: "/admin/usuarios", label: "Usuarios y roles" },
     { href: "/admin/ayuda", label: "Solicitudes de ayuda" },

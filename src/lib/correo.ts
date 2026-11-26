@@ -157,22 +157,6 @@ export function correoResultados(para: string, nombre: string, folio: string) {
   return enviar(para, asunto, html);
 }
 
-export function correoRecordatorioConfirmacion(
-  para: string,
-  nombre: string,
-  cierra: string,
-) {
-  return enviar(
-    para,
-    "Confirma tu participación · Reto ANUIES4MX 2026",
-    plantilla(
-      "Confirma tu lugar",
-      `<p>Hola ${nombre}:</p><p>Fuiste seleccionada para el Reto ANUIES4MX 2026. Para conservar tu lugar necesitas confirmar tu participación y llenar tus datos logísticos <strong>antes del ${cierra}</strong>.</p>`,
-      { texto: "Confirmar mi participación", url: `${BASE}/confirmacion` },
-    ),
-  );
-}
-
 /** Lo que escribe la aplicante (su nombre) viaja dentro del HTML del correo. */
 function escapar(texto: string) {
   return texto
@@ -247,6 +231,46 @@ export function correoRecordatorioCierre(
   opts: Parameters<typeof recordatorioCierre>[0],
 ) {
   const { asunto, html } = recordatorioCierre(opts);
+  return enviar(para, asunto, html);
+}
+
+/** Recordatorio a las seleccionadas que no han confirmado ni declinado.
+ *  Contenido separado del envío para la vista previa y la prueba del panel. */
+export function recordatorioConfirmacion(opts: {
+  nombre: string;
+  cierra: Date;
+  eventoInicia: Date;
+  eventoTermina: Date;
+  prueba?: boolean;
+  ahora?: Date;
+}) {
+  const dia = fecha(opts.cierra, "EEEE d 'de' MMMM");
+  const hora = fecha(opts.cierra, "HH:mm");
+  const restante = quedan(diasPara(opts.cierra, opts.ahora));
+  const evento = `del ${fecha(opts.eventoInicia, "d")} al ${fecha(opts.eventoTermina, "d 'de' MMMM")}`;
+
+  const aviso = opts.prueba
+    ? `<p style="background:#FBF5F8;border:1px dashed #D6336C;padding:10px 12px;font-size:12px;color:#8A1F49;margin:0 0 18px">Correo de prueba enviado desde el panel de administración. Las aplicantes no reciben este aviso.</p>`
+    : "";
+
+  return {
+    asunto: `${opts.prueba ? "[PRUEBA] " : ""}Confirma tu lugar antes del ${fecha(opts.cierra, "d 'de' MMMM")} · Reto ANUIES4MX 2026`,
+    html: plantilla(
+      "Confirma tu lugar",
+      `${aviso}<p>Hola ${escapar(opts.nombre)}:</p>
+       <p>Fuiste seleccionada para el Reto ANUIES4MX 2026 en Valle de Bravo, ${evento}, y todavía no recibimos tu confirmación.</p>
+       <p>Para conservar tu lugar entra a la plataforma, confirma tu participación y completa tus datos logísticos (ciudad de origen, contacto de emergencia y talla). La confirmación cierra el <strong>${dia} a las ${hora} h</strong> (hora del centro de México): ${restante}.</p>
+       <p>Si no puedes asistir, declina tu lugar en la misma pantalla: así ese lugar puede asignarse a otra aplicante.</p>`,
+      { texto: "Confirmar mi participación", url: `${BASE}/confirmacion` },
+    ),
+  };
+}
+
+export function correoRecordatorioConfirmacion(
+  para: string,
+  opts: Parameters<typeof recordatorioConfirmacion>[0],
+) {
+  const { asunto, html } = recordatorioConfirmacion(opts);
   return enviar(para, asunto, html);
 }
 
